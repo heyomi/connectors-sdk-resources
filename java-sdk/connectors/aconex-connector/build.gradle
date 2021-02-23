@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group 'com.lucidworks.connector.plugins'
+version '2.1.0'
+
+dependencies {
+    implementation "com.lucidworks.connectors.components:http-client-component:${componentsVersion}"
+    implementation "com.lucidworks-connector.sdk:connector-plugin-sdk:${connectorsSDKVersion}"
+    implementation "com.lucidworks.connectors.components:processors-component:${componentsVersion}"
+    implementation "com.lucidworks.connectors.components:http-client-component:${componentsVersion}"
+    implementation "com.lucidworks-connector.sdk:connector-plugin-sdk:${connectorsSDKVersion}"
+
+    implementation "com.lucidworks-schema:schema:${connectorsSDKVersion}"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}"
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+    implementation "javax.ws.rs:javax.ws.rs-api:${javaxRsVersion}"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
+}
