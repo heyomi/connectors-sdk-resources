@@ -1,4 +1,4 @@
-package com.lucidworks.connector.plugins.feed.config;
+package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.connector.plugin.api.config.ConnectorConfig;
 import com.lucidworks.fusion.connector.plugin.api.config.ConnectorPluginProperties;
@@ -19,8 +19,8 @@ public interface AconexConfig extends ConnectorConfig<AconexConfig.Properties> {
     AconexConfig.Properties properties();
 
     interface Properties extends ConnectorPluginProperties,
-            ConnectionTimeoutsConfig,
-            AuthenticationConfig,
+            ConnectionTimeoutProperties,
+            AuthenticationProperties,
             IndexConfig {
     }
 }

@@ -1,4 +1,4 @@
-package com.lucidworks.connector.plugins.feed.model;
+package com.lucidworks.connector.plugins.aconex.model;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

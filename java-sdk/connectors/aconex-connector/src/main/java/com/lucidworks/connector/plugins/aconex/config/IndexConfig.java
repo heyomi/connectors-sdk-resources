@@ -1,4 +1,4 @@
-package com.lucidworks.connector.plugins.feed.config;
+package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
 import com.lucidworks.fusion.schema.SchemaAnnotations;
@@ -6,7 +6,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations;
 public interface IndexConfig extends Model {
 
     @SchemaAnnotations.Property
-    ConnectionTimeoutsConfig.Properties requestProperties();
+    ConnectionTimeoutProperties.Properties requestProperties();
 
     @SchemaAnnotations.ObjectSchema(
             title = "Http client options",

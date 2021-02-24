@@ -1,11 +1,11 @@
-package com.lucidworks.connector.plugins.feed.config;
+package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
 import com.lucidworks.fusion.schema.SchemaAnnotations.NumberSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.ObjectSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 
-public interface ConnectionTimeoutsConfig extends Model {
+public interface ConnectionTimeoutProperties extends Model {
 
     @Property
     Properties timeoutsProperties();

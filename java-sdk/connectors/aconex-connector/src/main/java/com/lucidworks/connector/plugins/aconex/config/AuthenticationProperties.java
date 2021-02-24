@@ -1,10 +1,10 @@
-package com.lucidworks.connector.plugins.feed.config;
+package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 
-public interface AuthenticationConfig extends Model {
+public interface AuthenticationProperties extends Model {
 
     @Property(required = true, title = "Aconex Authentication Properties")
     Properties authentication();

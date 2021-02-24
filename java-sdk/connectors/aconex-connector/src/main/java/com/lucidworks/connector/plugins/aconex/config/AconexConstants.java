@@ -1,7 +1,7 @@
-package com.lucidworks.connector.plugins.feed.config;
+package com.lucidworks.connector.plugins.aconex.config;
 
 public class AconexConstants {
-    public static final String PROJECT = "project";
+    public static final String PROJECTS = "projects";
     public static final String REGISTER = "register";
     public static final String MARKEDUP = "markedup";
 

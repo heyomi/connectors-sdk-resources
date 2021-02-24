@@ -1,8 +1,7 @@
-package com.lucidworks.connector.plugins.feed.fetcher;
+package com.lucidworks.connector.plugins.aconex.fetcher;
 
-import com.lucidworks.connector.plugins.feed.AconexClient;
-import com.lucidworks.connector.plugins.feed.config.AconexConfig;
-import com.lucidworks.connectors.components.processor.ProcessorRunner;
+import com.lucidworks.connector.plugins.aconex.client.AconexClient;
+import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.FetchResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StartResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StopResult;
@@ -12,7 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
+
+// import com.lucidworks.connectors.components.processor.ProcessorRunner;
 
 public class AconexFetcher implements ContentFetcher {
 
@@ -33,31 +33,23 @@ public class AconexFetcher implements ContentFetcher {
 
   @Override
   public StartResult start(StartContext context) {
-    try {
-      client.open();
-    } catch (IOException e) {
-      logger.warn("Problem opening couchbase client", e);
-    }
+    logger.trace("Starting Job:{}", context.getJobRunInfo().getId());
     return context.newResult();
   }
 
   @Override
   public StopResult stop(StopContext context) {
-    if (client != null) {
-      try {
-        client.close();
-      } catch (Exception e) {
-        logger.warn("Problem closing", e);
-      }
-    }
+    logger.trace("Stopping Job:{}", context.getJobRunInfo().getId());
     return context.newResult();
   }
 
   @Override
-  public FetchResult fetch(FetchContext ctx) {
-    FetchInput input = ctx.getFetchInput();
+  public FetchResult fetch(FetchContext context) {
+    FetchInput input = context.getFetchInput();
     logger.trace("Fetching input={}", input);
-    return processorRunner.process(ctx, input);
+    return null;
+
+    // return processorRunner.process(ctx, input);
   }
 
 }
