@@ -22,5 +22,12 @@ public class RegisterSearch {
     }
 
     private class Document {
+        private boolean Confidential;
+        private String DocumentStatus;
+        private String DocumentType;
+        private String FileSize;
+        private String FileType;
+        private String Filename;
+        private String Title;
     }
 }

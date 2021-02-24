@@ -6,7 +6,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations;
 public interface IndexConfig extends Model {
 
     @SchemaAnnotations.Property
-    ConnectionTimeoutProperties.Properties requestProperties();
+    TimeoutProperties.Properties requestProperties();
 
     @SchemaAnnotations.ObjectSchema(
             title = "Http client options",

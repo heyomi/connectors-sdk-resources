@@ -12,4 +12,6 @@ public class AconexConstants {
 
     public static final String SEARCH_TYPE_PAGED = "PAGED";
     public static final String RETURN_FIELDS = "title,filename,author,doctype,fileSize,fileType,confidential,statusid";
+
+    public static final int TIMEOUT_MS = 10000;
 }

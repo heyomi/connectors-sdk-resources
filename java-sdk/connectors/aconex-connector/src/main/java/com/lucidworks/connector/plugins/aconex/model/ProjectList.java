@@ -3,17 +3,17 @@ package com.lucidworks.connector.plugins.aconex.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Map;
+import java.util.List;
 
 public class ProjectList {
-    private final Map<String, Project> searchResults;
+    private final List<Project> searchResults;
 
     @JsonCreator
-    public ProjectList(@JsonProperty("entries") Map<String, Project> searchResults) {
+    public ProjectList(@JsonProperty("searchResults") List<Project> searchResults) {
         this.searchResults = searchResults;
     }
 
-    public Map<String, Project> getSearchResults() {
+    public List<Project> getSearchResults() {
         return searchResults;
     }
 }

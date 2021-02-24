@@ -1,6 +1,7 @@
 package com.lucidworks.connector.plugins.aconex.client.rest;
 
 import com.lucidworks.connector.plugins.aconex.config.AconexConstants;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import java.net.URI;
 public class RestApiUriBuilder {
     private static final Logger logger = LoggerFactory.getLogger(RestApiUriBuilder.class);
 
-    public URI buildProjectsUri(String apiRootPath) {
+    public static URI buildProjectsUri(@NonNull String apiRootPath) {
         final URI uri = UriBuilder.fromPath(apiRootPath).path(AconexConstants.PROJECTS).build();
         final String uriString = uri.toString();
 
@@ -18,7 +19,7 @@ public class RestApiUriBuilder {
         return uri;
     }
 
-    public URI buildDocumentsUri(String apiRootPath, String projectId) {
+    public static URI buildDocumentsUri(@NonNull String apiRootPath, String projectId) {
         UriBuilder uriBuilder = UriBuilder.fromPath(apiRootPath)
                 .path(AconexConstants.PROJECTS)
                 .path(projectId)
@@ -36,7 +37,7 @@ public class RestApiUriBuilder {
         return uri;
     }
 
-    public URI buildFetchDocumentsUri(final String apiRootPath, String projectId, String documentId) {
+    public static URI buildFetchDocumentsUri(@NonNull String apiRootPath, String projectId, String documentId) {
         final URI uri = UriBuilder.fromPath(apiRootPath)
                 .path(AconexConstants.PROJECTS)
                 .path(projectId)

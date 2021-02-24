@@ -5,10 +5,10 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.NumberSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.ObjectSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 
-public interface ConnectionTimeoutProperties extends Model {
+public interface TimeoutProperties extends Model {
 
     @Property
-    Properties timeoutsProperties();
+    Properties properties();
 
     @ObjectSchema(title = "Http client options", description = "A set of options for configuring the http client.")
     interface Properties extends Model {
