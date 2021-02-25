@@ -26,7 +26,7 @@ public class RestApiUriBuilder {
                 .path(AconexConstants.REGISTER);
 
         uriBuilder.queryParam(AconexConstants.PARAM_SEARCH_TYPE, AconexConstants.SEARCH_TYPE_PAGED);
-        uriBuilder.queryParam(AconexConstants.PARAM_PAGE_SIZE, 25);
+        uriBuilder.queryParam(AconexConstants.PARAM_PAGE_SIZE, 250);
         uriBuilder.queryParam(AconexConstants.PARAM_PAGE_NUMBER, 1);
         uriBuilder.queryParam(AconexConstants.PARAM_RETURN_FIELDS, AconexConstants.RETURN_FIELDS);
 
@@ -37,7 +37,7 @@ public class RestApiUriBuilder {
         return uri;
     }
 
-    public static URI buildFetchDocumentsUri(@NonNull String apiRootPath, String projectId, String documentId) {
+    public static URI buildDownloadDocumentsUri(@NonNull String apiRootPath, String projectId, String documentId) {
         final URI uri = UriBuilder.fromPath(apiRootPath)
                 .path(AconexConstants.PROJECTS)
                 .path(projectId)

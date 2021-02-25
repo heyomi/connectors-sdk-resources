@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
 import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
 import com.lucidworks.connector.plugins.aconex.model.Document;
@@ -27,6 +28,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.TIMEOUT_MS;
 
@@ -36,10 +38,12 @@ public class AconexHttpClient {
     private final HttpClient httpClient;
     private String basicAuth;
     private String apiEndpoint;
+    private String fileTypes;
 
-    public AconexHttpClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties) {
+    public AconexHttpClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties, AdditionalProperties additionalProperties) {
         this.httpClient = createHttpClient(authenticationProperties, timeoutProperties);
         this.apiEndpoint = getApiEndpoint(authenticationProperties);
+        this.fileTypes = additionalProperties.properties().fileType();
     }
 
     private String getApiEndpoint(AuthenticationProperties properties) {
@@ -49,8 +53,8 @@ public class AconexHttpClient {
     private HttpClient createHttpClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties) {
         int timeout = TIMEOUT_MS;
 
-        if (timeoutProperties != null && timeoutProperties.properties() != null) {
-            timeout = timeoutProperties.properties().connectTimeoutMs();
+        if (timeoutProperties != null && timeoutProperties.timeout() != null) {
+            timeout = timeoutProperties.timeout().connectTimeoutMs();
         }
 
         setBasicAuth(basicAuth(authenticationProperties.auth().username(), authenticationProperties.auth().password()));
@@ -112,6 +116,14 @@ public class AconexHttpClient {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
+            if (response.statusCode() == 401) {
+                throw new NotAuthorizedException(response.body());
+            }
+
+            if (response.statusCode() == 403) {
+                throw new ForbiddenException(response.body());
+            }
+
             if (response.statusCode() != 200) {
                 logger.warn("An error occurred while accessing project #{}, response: {}", projectId, response.body());
             } else {
@@ -124,6 +136,40 @@ public class AconexHttpClient {
         return documents;
     }
 
+    public Object getDocumentContent(String projectId, String documentId, String fileType) {
+        logger.info("Getting document content from project={}", projectId);
+
+        Object document = null;
+        try {
+            final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(apiEndpoint, projectId, documentId);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 401) {
+                throw new NotAuthorizedException(response.body());
+            }
+
+            if (response.statusCode() == 403) {
+                throw new ForbiddenException(response.body());
+            }
+
+            if (response.statusCode() != 200) {
+                logger.warn("An error occurred while accessing project #{}, response: {}", projectId, response.body());
+            } else {
+                document = response.body();
+            }
+        } catch (IOException | InterruptedException e) {
+            logger.error("An error occurred while getting documents", e);
+        }
+
+        return document;
+    }
+
     private static String basicAuth(@NonNull String username, @NonNull String password) {
         return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
@@ -132,8 +178,16 @@ public class AconexHttpClient {
         XmlMapper xmlMapper = new XmlMapper();
         RegisterSearch value = xmlMapper.readValue(xml, RegisterSearch.class);
         SearchResults result = value.getSearchResults();
+        List<Document> documents = result.getDocuments();
 
-        return result.getDocuments();
+        if(fileTypes != null) {
+            logger.info("Applying file type [{}] document filter", fileTypes);
+            documents = documents.stream()
+                    .filter(p -> (p.getFileType() != null && fileTypes.contains(p.getFileType().toLowerCase())))
+                    .collect(Collectors.toList());
+        }
+
+        return documents;
     }
 
     public String getBasicAuth() {

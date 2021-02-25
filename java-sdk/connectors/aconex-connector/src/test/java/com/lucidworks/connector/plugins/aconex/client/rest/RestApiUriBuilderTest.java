@@ -29,7 +29,7 @@ class RestApiUriBuilderTest {
     @Test
     void buildFetchDocumentsUri() {
         RestApiUriBuilder builder = new RestApiUriBuilder();
-        URI uri = builder.buildFetchDocumentsUri(apiRoot, "0123456789", "9876543210");
+        URI uri = builder.buildDownloadDocumentsUri(apiRoot, "0123456789", "9876543210");
 
         assertThat(uri.toASCIIString(), is("https://apidev.aconex.com/api/projects/0123456789/register/9876543210/markedup"));
     }

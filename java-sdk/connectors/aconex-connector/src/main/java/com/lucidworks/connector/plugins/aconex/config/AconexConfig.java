@@ -21,6 +21,6 @@ public interface AconexConfig extends ConnectorConfig<AconexConfig.Properties> {
     interface Properties extends ConnectorPluginProperties,
             TimeoutProperties,
             AuthenticationProperties,
-            IndexConfig {
+            AdditionalProperties {
     }
 }

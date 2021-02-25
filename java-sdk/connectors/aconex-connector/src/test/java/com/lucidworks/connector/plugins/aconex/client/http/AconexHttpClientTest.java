@@ -1,5 +1,6 @@
 package com.lucidworks.connector.plugins.aconex.client.http;
 
+import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
 import com.lucidworks.connector.plugins.aconex.model.Document;
@@ -25,21 +26,31 @@ class AconexHttpClientTest {
     TimeoutProperties timeoutProperties;
 
     @Mock
+    AdditionalProperties additionalProperties;
+
+    @Mock
     AuthenticationProperties.Properties authProps;
 
     @Mock
     TimeoutProperties.Properties timeoutProps;
 
+    @Mock
+    AdditionalProperties.Properties addProps;
+
     private String apiEndpoint = "https://apidev.aconex.com/api";
     private String projectId = "1879048409";
+    private String documentId = "271341877549097596";
+    private String fileType = "pdf,doc";
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         when(authProps.instanceUrl()).thenReturn("https://apidev.aconex.com");
         when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
+        when(addProps.fileType()).thenReturn(fileType);
         when(authenticationProperties.auth()).thenReturn(authProps);
-        when(timeoutProperties.properties()).thenReturn(timeoutProps);
+        when(timeoutProperties.timeout()).thenReturn(timeoutProps);
+        when(additionalProperties.properties()).thenReturn(addProps);
     }
 
     @Test
@@ -69,6 +80,17 @@ class AconexHttpClientTest {
     }
 
     @Test
+    void getDownloadedDocuments() {
+        when(authProps.username()).thenReturn("poleary");
+        when(authProps.password()).thenReturn("Auth3nt1c");
+
+        initClient();
+        Object document = client.getDocumentContent(projectId, documentId, fileType);
+
+        assertNotNull(document);
+    }
+
+    @Test
     void getApiEndpoint() {
         when(authProps.username()).thenReturn("dmori");
         when(authProps.password()).thenReturn("Auth3nt1c");
@@ -90,6 +112,6 @@ class AconexHttpClientTest {
     }
 
     private void initClient() {
-        client = new AconexHttpClient(authenticationProperties, timeoutProperties);
+        client = new AconexHttpClient(authenticationProperties, timeoutProperties, additionalProperties);
     }
 }

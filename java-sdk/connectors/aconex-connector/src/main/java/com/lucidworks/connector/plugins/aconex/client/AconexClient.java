@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClient;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
+import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.Project;
@@ -24,17 +25,19 @@ public class AconexClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexClient.class);
     private final AuthenticationProperties authenticationProperties;
     private final TimeoutProperties timeoutProperties;
+    private final AdditionalProperties additionalProperties;
     private final AconexHttpClient httpClient;
     private LoadingCache<String, ProjectList> projectListCache;
     private String apiEndpoint;
 
     private Map<String, List<String>> projectDocumentIds = new HashMap<>();
 
-    public AconexClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties) {
-        this.httpClient = new AconexHttpClient(authenticationProperties, timeoutProperties);
+    public AconexClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties, AdditionalProperties additionalProperties) {
+        this.httpClient = new AconexHttpClient(authenticationProperties, timeoutProperties, additionalProperties);
         this.apiEndpoint = httpClient.getApiEndpoint();
         this.authenticationProperties = authenticationProperties;
         this.timeoutProperties = timeoutProperties;
+        this.additionalProperties = additionalProperties;
         this.projectListCache = getProjectsCache(apiEndpoint);
     }
 

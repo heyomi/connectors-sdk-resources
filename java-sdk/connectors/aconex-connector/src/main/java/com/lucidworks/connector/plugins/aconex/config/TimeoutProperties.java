@@ -8,7 +8,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 public interface TimeoutProperties extends Model {
 
     @Property
-    Properties properties();
+    Properties timeout();
 
     @ObjectSchema(title = "Http client options", description = "A set of options for configuring the http client.")
     interface Properties extends Model {

@@ -16,8 +16,12 @@ public class Document {
     private boolean confidential;
     private String documentStatus;
     private String documentType;
+    @JacksonXmlProperty(localName = "FileSize")
     private String fileSize;
+    @JacksonXmlProperty(localName = "FileType")
     private String fileType;
+    @JacksonXmlProperty(localName = "FileName")
     private String filename;
+    @JacksonXmlProperty(localName = "Title")
     private String title;
 }
