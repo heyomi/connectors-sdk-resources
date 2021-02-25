@@ -1,33 +1,27 @@
 package com.lucidworks.connector.plugins.aconex.model;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@XmlRootElement
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
 public class RegisterSearch {
-    @XmlElement(name = "SearchResults")
-    private final SearchResults searchResults;
+    @JacksonXmlProperty(localName = "SearchResults")
+    private SearchResults searchResults;
+    @JacksonXmlProperty(localName = "TotalResults")
+    private int totalResult;
+    @JacksonXmlProperty(localName = "TotalResultsOnPage")
+    private int totalResultsOnPage;
+    @JacksonXmlProperty(localName = "TotalPages")
+    private int totalPages;
+    @JacksonXmlProperty(localName = "PageSize")
+    private int pageSize;
+    @JacksonXmlProperty(localName = "CurrentPage")
+    private int currentPage;
 
-    public RegisterSearch(SearchResults searchResults) {
-        this.searchResults = searchResults;
-    }
-
-    private class SearchResults {
-        @XmlElement(name = "Document")
-        private final Document document;
-
-        private SearchResults(Document document) {
-            this.document = document;
-        }
-    }
-
-    private class Document {
-        private boolean Confidential;
-        private String DocumentStatus;
-        private String DocumentType;
-        private String FileSize;
-        private String FileType;
-        private String Filename;
-        private String Title;
-    }
 }

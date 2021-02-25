@@ -1,107 +1,82 @@
 package com.lucidworks.connector.plugins.aconex.client;
 
-import com.google.gson.Gson;
-import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClient;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
+import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.Project;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
-import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.TIMEOUT_MS;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class AconexClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexClient.class);
     private final AuthenticationProperties authenticationProperties;
     private final TimeoutProperties timeoutProperties;
-    private String apiRoot;
-    private String basicAuth;
-    private HttpClient httpClient;
-    private List<Project> projects;
+    private final AconexHttpClient httpClient;
+    private LoadingCache<String, ProjectList> projectListCache;
+    private String apiEndpoint;
+
+    private Map<String, List<String>> projectDocumentIds = new HashMap<>();
 
     public AconexClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties) {
+        this.httpClient = new AconexHttpClient(authenticationProperties, timeoutProperties);
+        this.apiEndpoint = httpClient.getApiEndpoint();
         this.authenticationProperties = authenticationProperties;
         this.timeoutProperties = timeoutProperties;
-
-        init();
+        this.projectListCache = getProjectsCache(apiEndpoint);
     }
 
-    private void init() {
-        int timeout = TIMEOUT_MS;
-
-        if (timeoutProperties != null && timeoutProperties.properties() != null) {
-            timeout = timeoutProperties.properties().connectTimeoutMs();
-        }
-
-        this.httpClient = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .connectTimeout(Duration.ofMillis(timeout))
-                .build();
-
-        this.apiRoot = "https://apidev.aconex.com/api";
-        this.basicAuth = basicAuth(this.authenticationProperties.authentication().username(), this.authenticationProperties.authentication().password());
-    }
-
-    public List<Project> getProjects() {
+    private List<Project> getProjects() {
         try {
-            final URI uri = RestApiUriBuilder.buildProjectsUri(apiRoot);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(uri)
-                    .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                    .setHeader(HttpHeaders.AUTHORIZATION, basicAuth)
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 401) {
-                throw new NotAuthorizedException(response.body());
-            }
-
-            ProjectList projectList = new Gson().fromJson(response.body(), ProjectList.class);
-            projects = projectList.getSearchResults();
-            logger.info("Projects={}", projects.size());
-        } catch (IOException | InterruptedException e) {
-            logger.error("An error occurred while getting projects", e);
+            ProjectList projectList = projectListCache.get(apiEndpoint);
+            return projectList.getSearchResults();
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Could not load project instance " + apiEndpoint, e.getCause());
         }
-
-        return projects;
     }
 
-    public Object getDocumentIds() {
-        try {
-            for (Project project : getProjects()) {
-                final URI uri = RestApiUriBuilder.buildDocumentsUri(apiRoot, project.getProjectID());
-                HttpRequest request = HttpRequest.newBuilder()
-                        .GET()
-                        .uri(uri)
-                        .setHeader(HttpHeaders.AUTHORIZATION, basicAuth)
-                        .build();
+    private void processProjectDocumentIds() {
+        Project p = new Project("1879048409", "");
+        List<Project> projects = getProjects();
+        projects = Collections.singletonList(p);
 
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                logger.info(response.body());
-            }
-        } catch (IOException | InterruptedException e) {
-            logger.error("An error occurred while getting documents", e);
+        for (Project project : projects) {
+            List<Document> documents = httpClient.getDocuments(project.getProjectID());
+            List<String> ids = documents.stream().map(Document::getId).collect(Collectors.toList());
+            projectDocumentIds.putIfAbsent(project.getProjectID(), ids);
         }
-        return null;
+
+        setProjectDocumentIds(projectDocumentIds);
     }
 
-    private static String basicAuth(String username, String password) {
-        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+    private Map<String, List<String>> getProjectDocumentIds() {
+        return projectDocumentIds;
+    }
+
+    public void setProjectDocumentIds(Map<String, List<String>> projectDocumentIds) {
+        this.projectDocumentIds = (projectDocumentIds == null) ? new HashMap<>() : projectDocumentIds;
+    }
+
+    private LoadingCache<String, ProjectList> getProjectsCache(String apiEndpoint) {
+        return CacheBuilder.newBuilder()
+                .expireAfterAccess(1, TimeUnit.HOURS)
+                .build(new CacheLoader<String, ProjectList>() {
+                    @Override
+                    public ProjectList load(String apiEndpoint) throws Exception {
+                        return httpClient.getProjectList(apiEndpoint);
+                    }
+                });
     }
 }

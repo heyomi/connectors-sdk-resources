@@ -7,7 +7,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 public interface AuthenticationProperties extends Model {
 
     @Property(required = true, title = "Aconex Authentication Properties")
-    Properties authentication();
+    Properties auth();
 
     interface Properties extends Model {
 

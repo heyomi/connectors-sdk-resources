@@ -20,7 +20,7 @@ dependencies {
     implementation "com.lucidworks-schema:schema:${connectorsSDKVersion}"
 
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
     implementation "com.google.code.gson:gson:${gsonVersion}"
     implementation "javax.ws.rs:javax.ws.rs-api:${javaxRsVersion}"
     implementation "javax.xml.bind:jaxb-api:${javaxXmlVersion}"
