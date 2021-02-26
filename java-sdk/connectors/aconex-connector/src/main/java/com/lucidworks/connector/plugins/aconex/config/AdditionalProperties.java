@@ -7,7 +7,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 public interface AdditionalProperties extends Model {
 
     @Property(required = true, title = "Index Properties")
-    Properties properties();
+    Properties additional();
 
     interface Properties extends Model {
         @Property(title = "File Type")

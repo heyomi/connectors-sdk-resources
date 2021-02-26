@@ -2,7 +2,7 @@ package com.lucidworks.connector.plugins.aconex;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
-import com.lucidworks.connector.plugins.aconex.client.AconexClient;
+import com.lucidworks.connector.plugins.aconex.client.AconexService;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.fetcher.AconexFetcher;
 import com.lucidworks.fusion.connector.plugin.api.plugin.ConnectorPlugin;
@@ -21,7 +21,7 @@ public class AconexPlugin implements ConnectorPluginProvider {
     Module fetchModule = new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AconexClient.class).asEagerSingleton();
+        bind(AconexService.class).asEagerSingleton();
       }
     };
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
+import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.DEFAULT_PAGE_SIZE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -23,7 +24,8 @@ class RestApiUriBuilderTest {
         RestApiUriBuilder builder = new RestApiUriBuilder();
         URI uri = builder.buildDocumentsUri(apiRoot, "0123456789");
 
-        assertThat(uri.toString(), is("https://apidev.aconex.com/api/projects/0123456789/register?search_type=PAGED&page_size=25&page_number=1&return_fields=title%2Cfilename%2Cauthor%2Cdoctype%2CfileSize%2CfileType%2Cconfidential%2Cstatusid"));
+        assertThat(uri.toASCIIString(), is("https://apidev.aconex.com/api/projects/0123456789/register?search_type=PAGED&page_size="
+                + DEFAULT_PAGE_SIZE + "&page_number=1&return_fields=title,filename,author,doctype,fileSize,fileType,confidential,statusid"));
     }
 
     @Test

@@ -51,7 +51,7 @@ class AconexHttpClientTest {
         when(addProps.fileType()).thenReturn(fileType);
         when(authenticationProperties.auth()).thenReturn(authProps);
         when(timeoutProperties.timeout()).thenReturn(timeoutProps);
-        when(additionalProperties.properties()).thenReturn(addProps);
+        when(additionalProperties.additional()).thenReturn(addProps);
     }
 
     @Test
@@ -130,6 +130,6 @@ class AconexHttpClientTest {
     }
 
     private void initClient() {
-        client = new AconexHttpClient(authenticationProperties, timeoutProperties, additionalProperties);
+        client = new AconexHttpClient(authProps, timeoutProps, addProps);
     }
 }

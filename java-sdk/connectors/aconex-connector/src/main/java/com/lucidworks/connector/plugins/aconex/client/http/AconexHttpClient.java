@@ -38,7 +38,6 @@ import java.time.Duration;
 import java.util.*;
 
 import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.IMAGE_FILE_TYPE;
-import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.TIMEOUT_MS;
 
 public class AconexHttpClient {
 
@@ -48,28 +47,18 @@ public class AconexHttpClient {
     private final String fileTypes;
     private String basicAuth;
 
-    public AconexHttpClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties, AdditionalProperties additionalProperties) {
-        this.httpClient = createHttpClient(authenticationProperties, timeoutProperties);
-        this.apiEndpoint = getApiEndpoint(authenticationProperties);
-        this.fileTypes = additionalProperties.properties().fileType();
+    public AconexHttpClient(AuthenticationProperties.Properties auth, TimeoutProperties.Properties timeout, AdditionalProperties.Properties additional) {
+        this.httpClient = createHttpClient(auth.username(), auth.password(), timeout.connectTimeoutMs());
+        this.apiEndpoint = auth.instanceUrl() + "/api";
+        this.fileTypes = additional.fileType();
     }
 
-    private String getApiEndpoint(AuthenticationProperties properties) {
-        return properties.auth().instanceUrl() + "/api";
-    }
-
-    private HttpClient createHttpClient(AuthenticationProperties authenticationProperties, TimeoutProperties timeoutProperties) {
-        int timeout = TIMEOUT_MS;
-
-        if (timeoutProperties != null && timeoutProperties.timeout() != null) {
-            timeout = timeoutProperties.timeout().connectTimeoutMs();
-        }
-
-        setBasicAuth(basicAuth(authenticationProperties.auth().username(), authenticationProperties.auth().password()));
+    private HttpClient createHttpClient(String username, String password, int connectionTimeout) {
+        setBasicAuth(basicAuth(username, password));
 
         return HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_2)
-                .connectTimeout(Duration.ofMillis(timeout))
+                .connectTimeout(Duration.ofMillis(connectionTimeout))
                 .build();
     }
 

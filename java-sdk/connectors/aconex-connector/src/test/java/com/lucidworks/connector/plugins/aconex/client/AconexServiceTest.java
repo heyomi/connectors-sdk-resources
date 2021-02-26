@@ -11,8 +11,8 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-class AconexClientTest {
-    AconexClient client;
+class AconexServiceTest {
+    AconexService client;
 
     @Mock
     AuthenticationProperties authenticationProperties;
@@ -39,7 +39,7 @@ class AconexClientTest {
         when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
         when(authenticationProperties.auth()).thenReturn(authProps);
         when(timeoutProperties.timeout()).thenReturn(timeoutProps);
-        when(additionalProperties.properties()).thenReturn(addProps);
+        when(additionalProperties.additional()).thenReturn(addProps);
     }
 
     @Test
@@ -47,7 +47,7 @@ class AconexClientTest {
         when(authProps.username()).thenReturn("poleary");
         when(authProps.password()).thenReturn("Auth3nt1c");
 
-        client = new AconexClient(authenticationProperties, timeoutProperties, additionalProperties);
+        client = new AconexService(authenticationProperties.auth(), timeoutProperties.timeout(), additionalProperties.additional());
         Object content = client.getContent();
 
         assertNotNull(content);

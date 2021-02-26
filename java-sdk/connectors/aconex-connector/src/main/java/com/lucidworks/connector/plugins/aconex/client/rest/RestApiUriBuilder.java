@@ -6,6 +6,8 @@ import lombok.NonNull;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
+import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.DEFAULT_PAGE_SIZE;
+
 public class RestApiUriBuilder {
 
     public static URI buildProjectsUri(@NonNull String apiRootPath) {
@@ -19,7 +21,7 @@ public class RestApiUriBuilder {
                 .path(AconexConstants.REGISTER);
 
         uriBuilder.queryParam(AconexConstants.PARAM_SEARCH_TYPE, AconexConstants.SEARCH_TYPE_PAGED);
-        uriBuilder.queryParam(AconexConstants.PARAM_PAGE_SIZE, 250);
+        uriBuilder.queryParam(AconexConstants.PARAM_PAGE_SIZE, DEFAULT_PAGE_SIZE);
         uriBuilder.queryParam(AconexConstants.PARAM_PAGE_NUMBER, 1);
         uriBuilder.queryParam(AconexConstants.PARAM_RETURN_FIELDS, AconexConstants.RETURN_FIELDS);
 

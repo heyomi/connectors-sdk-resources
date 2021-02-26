@@ -10,6 +10,7 @@ public class AconexConstants {
     public static final String PARAM_PAGE_NUMBER = "page_number";
     public static final String PARAM_RETURN_FIELDS = "return_fields";
 
+    public static final int DEFAULT_PAGE_SIZE = 25;
     public static final String SEARCH_TYPE_PAGED = "PAGED";
     public static final String RETURN_FIELDS = "title,filename,author,doctype,fileSize,fileType,confidential,statusid";
 
