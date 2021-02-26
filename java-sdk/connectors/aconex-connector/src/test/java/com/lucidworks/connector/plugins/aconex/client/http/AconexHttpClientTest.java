@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.NotAuthorizedException;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -80,14 +81,31 @@ class AconexHttpClientTest {
     }
 
     @Test
-    void getDownloadedDocuments() {
+    void getDownloadedDocuments_whenFileTypeIsPDF() {
         when(authProps.username()).thenReturn("poleary");
         when(authProps.password()).thenReturn("Auth3nt1c");
 
         initClient();
-        Object document = client.getDocumentContent(projectId, documentId, fileType);
+        Map<String, String> document = client.getDocumentContent(projectId, documentId);
 
         assertNotNull(document);
+        assertNotNull(document.get("pdf:PDFVersion"));
+        assertNotNull(document.get("body"));
+        assertNotNull(document.get("date"));
+    }
+
+    @Test
+    void getDownloadedDocuments_whenFileTypeIsDoc() {
+        when(authProps.username()).thenReturn("poleary");
+        when(authProps.password()).thenReturn("Auth3nt1c");
+
+        initClient();
+        Map<String, String> document = client.getDocumentContent("1879048400", "271341877549081900");
+
+        assertNotNull(document);
+        assertNotNull(document.get("body"));
+        assertNotNull(document.get("date"));
+        assertNull(document.get("pdf:PDFVersion"));
     }
 
     @Test

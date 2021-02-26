@@ -12,22 +12,30 @@ import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import com.lucidworks.connector.plugins.aconex.model.SearchResults;
 import lombok.NonNull;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.UnknownServiceException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.TIMEOUT_MS;
@@ -136,10 +144,10 @@ public class AconexHttpClient {
         return documents;
     }
 
-    public Object getDocumentContent(String projectId, String documentId, String fileType) {
+    public Map<String, String> getDocumentContent(@NonNull String projectId, @NonNull String documentId) {
         logger.info("Getting document content from project={}", projectId);
 
-        Object document = null;
+        Map<String, String> content = null;
         try {
             final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(apiEndpoint, projectId, documentId);
             HttpRequest request = HttpRequest.newBuilder()
@@ -148,26 +156,54 @@ public class AconexHttpClient {
                     .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
             if (response.statusCode() == 401) {
-                throw new NotAuthorizedException(response.body());
+                throw new NotAuthorizedException(Arrays.toString(response.body()));
             }
 
             if (response.statusCode() == 403) {
-                throw new ForbiddenException(response.body());
+                throw new ForbiddenException(Arrays.toString(response.body()));
             }
 
             if (response.statusCode() != 200) {
                 logger.warn("An error occurred while accessing project #{}, response: {}", projectId, response.body());
+                throw new UnknownServiceException(Arrays.toString(response.body()));
             } else {
-                document = response.body();
+                content = parseDocument(response.body());
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | TikaException | SAXException e) {
             logger.error("An error occurred while getting documents", e);
+        } catch (InterruptedException e) {
+            logger.warn("Interrupted!", e);
+            Thread.currentThread().interrupt();
         }
 
-        return document;
+        return content;
+    }
+
+    private Map<String, String> parseDocument(byte[] body) throws TikaException, SAXException, IOException {
+        Map<String, String> content = new HashMap<>();
+        Parser parser = new AutoDetectParser();
+        BodyContentHandler handler = new BodyContentHandler();
+        Metadata metadata = new Metadata();
+        ParseContext parseContext = new ParseContext();
+        InputStream targetStream = new ByteArrayInputStream(body);
+
+        // parsing the document
+        parser.parse(targetStream, handler, metadata, parseContext);
+
+        //getting the content of the document
+        content.put("body", handler.toString());
+
+        //getting metadata of the document
+        String[] metadataNames = metadata.names();
+
+        for(String name : metadataNames) {
+            content.put(name, metadata.get(name));
+        }
+
+        return content;
     }
 
     private static String basicAuth(@NonNull String username, @NonNull String password) {

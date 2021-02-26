@@ -24,6 +24,10 @@ dependencies {
     implementation "com.google.code.gson:gson:${gsonVersion}"
     implementation "javax.ws.rs:javax.ws.rs-api:${javaxRsVersion}"
     implementation "javax.xml.bind:jaxb-api:${javaxXmlVersion}"
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.25'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '1.25'
+    implementation group: 'org.apache.tika', name: 'tika', version: '1.25', ext: 'pom'
+    implementation group: 'org.apache.tika', name: 'tika-app', version: '1.25'
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
