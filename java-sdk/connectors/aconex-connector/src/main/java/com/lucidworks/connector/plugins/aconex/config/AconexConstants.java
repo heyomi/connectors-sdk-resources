@@ -14,4 +14,5 @@ public class AconexConstants {
     public static final String RETURN_FIELDS = "title,filename,author,doctype,fileSize,fileType,confidential,statusid";
 
     public static final int TIMEOUT_MS = 10000;
+    public static final String IMAGE_FILE_TYPE = "jpg,jpeg,png,gif";
 }

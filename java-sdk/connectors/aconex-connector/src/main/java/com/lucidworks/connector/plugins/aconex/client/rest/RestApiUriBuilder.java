@@ -2,21 +2,14 @@ package com.lucidworks.connector.plugins.aconex.client.rest;
 
 import com.lucidworks.connector.plugins.aconex.config.AconexConstants;
 import lombok.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 public class RestApiUriBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(RestApiUriBuilder.class);
 
     public static URI buildProjectsUri(@NonNull String apiRootPath) {
-        final URI uri = UriBuilder.fromPath(apiRootPath).path(AconexConstants.PROJECTS).build();
-        final String uriString = uri.toString();
-
-        logger.info("Built URI: {}, length={}", uriString, uriString.length());
-        return uri;
+        return UriBuilder.fromPath(apiRootPath).path(AconexConstants.PROJECTS).build();
     }
 
     public static URI buildDocumentsUri(@NonNull String apiRootPath, String projectId) {
@@ -30,25 +23,16 @@ public class RestApiUriBuilder {
         uriBuilder.queryParam(AconexConstants.PARAM_PAGE_NUMBER, 1);
         uriBuilder.queryParam(AconexConstants.PARAM_RETURN_FIELDS, AconexConstants.RETURN_FIELDS);
 
-        final URI uri = uriBuilder.build();
-        final String uriString = uri.toString();
-
-        logger.info("Built URI: {}, length={}", uriString, uriString.length());
-        return uri;
+        return uriBuilder.build();
     }
 
     public static URI buildDownloadDocumentsUri(@NonNull String apiRootPath, String projectId, String documentId) {
-        final URI uri = UriBuilder.fromPath(apiRootPath)
+        return UriBuilder.fromPath(apiRootPath)
                 .path(AconexConstants.PROJECTS)
                 .path(projectId)
                 .path(AconexConstants.REGISTER)
                 .path(documentId)
                 .path(AconexConstants.MARKEDUP)
                 .build();
-
-        final String uriString = uri.toString();
-
-        logger.info("Built URI: {}, length={}", uriString, uriString.length());
-        return uri;
     }
 }
