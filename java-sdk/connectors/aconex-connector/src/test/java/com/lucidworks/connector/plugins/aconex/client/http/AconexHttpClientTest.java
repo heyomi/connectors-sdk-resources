@@ -86,7 +86,7 @@ class AconexHttpClientTest {
         when(authProps.password()).thenReturn("Auth3nt1c");
 
         initClient();
-        Map<String, String> document = client.getDocumentContent(projectId, documentId);
+        Map<String, Object> document = client.getDocumentContent(projectId, documentId);
 
         assertNotNull(document);
         assertNotNull(document.get("pdf:PDFVersion"));
@@ -100,7 +100,7 @@ class AconexHttpClientTest {
         when(authProps.password()).thenReturn("Auth3nt1c");
 
         initClient();
-        Map<String, String> document = client.getDocumentContent("1879048400", "271341877549081900");
+        Map<String, Object> document = client.getDocumentContent("1879048400", "271341877549081900");
 
         assertNotNull(document);
         assertNotNull(document.get("body"));

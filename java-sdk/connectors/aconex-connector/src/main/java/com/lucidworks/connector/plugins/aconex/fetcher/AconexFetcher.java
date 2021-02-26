@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
+import java.util.Map;
 
 // import com.lucidworks.connectors.components.processor.ProcessorRunner;
 
@@ -47,7 +49,27 @@ public class AconexFetcher implements ContentFetcher {
     logger.trace("Fetching input={}", input);
 
     try {
-      service.getContent();
+      Map<String, Map<String, Object>> content = service.getContent();
+
+      if (content != null && !content.isEmpty()) {
+
+        for (String key : content.keySet()) {
+          Map<String, Object> pageContentMap = content.get(key);
+          context.newDocument(key)
+                  .fields(field -> {
+                    field.setString("url", key); // TODO: Figure out how to get document URL from Aconex
+                    field.setLong("lastUpdated", ZonedDateTime.now().toEpochSecond());
+                    field.merge(pageContentMap);
+                  })
+                  .emit();
+        }
+      } else {
+        String message = "Failed to store all Aconex Content.";
+        logger.error(message);
+        context.newError(context.getFetchInput().getId())
+                .withError(message)
+                .emit();
+      }
 
     } catch (Exception e) {
       String message = "Failed to parse content from Aconex!";

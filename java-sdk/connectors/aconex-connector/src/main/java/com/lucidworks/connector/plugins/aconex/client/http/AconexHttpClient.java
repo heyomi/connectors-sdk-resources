@@ -123,8 +123,8 @@ public class AconexHttpClient {
         return documents;
     }
 
-    public Map<String, String> getDocumentContent(@NonNull String projectId, @NonNull String documentId) {
-        Map<String, String> content = null;
+    public Map<String, Object> getDocumentContent(@NonNull String projectId, @NonNull String documentId) {
+        Map<String, Object> content = null;
         try {
             final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(apiEndpoint, projectId, documentId);
             HttpRequest request = HttpRequest.newBuilder()
@@ -173,8 +173,8 @@ public class AconexHttpClient {
         return response;
     }
 
-    private Map<String, String> parseDocument(byte[] body) throws TikaException, SAXException, IOException {
-        Map<String, String> content = new HashMap<>();
+    private Map<String, Object> parseDocument(byte[] body) throws TikaException, SAXException, IOException {
+        Map<String, Object> content = new HashMap<>();
         Parser parser = new AutoDetectParser();
         // No limit; Your document contained more than 100000 characters, and so your requested limit has been reached. To receive the full text of the document.
         BodyContentHandler handler = new BodyContentHandler(-1);

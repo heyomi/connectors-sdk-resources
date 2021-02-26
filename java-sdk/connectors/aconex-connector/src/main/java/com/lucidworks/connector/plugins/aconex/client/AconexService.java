@@ -33,10 +33,10 @@ public class AconexService {
         this.projectListCache = getProjectsCache(apiEndpoint);
     }
 
-    public Map<String, Map<String, String>> getContent() {
+    public Map<String, Map<String, Object>> getContent() {
         logger.info("Getting content...");
 
-        Map<String, Map<String, String>> content = new HashMap<>();
+        Map<String, Map<String, Object>> content = new HashMap<>();
         Project p = new Project("1879048409", "");
         List<Project> projects = getProjects();
         projects = Collections.singletonList(p);
@@ -44,7 +44,7 @@ public class AconexService {
         for (Project project : projects) {
             List<Document> documents = httpClient.getDocuments(project.getProjectID());
             List<String> ids = documents.stream().map(Document::getId).collect(Collectors.toList());
-            Map<String, String> document;
+            Map<String, Object> document;
 
             for (String id: ids) {
                 document = httpClient.getDocumentContent(project.getProjectID(), id);
