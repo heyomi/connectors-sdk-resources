@@ -1,10 +1,11 @@
-package com.lucidworks.connector.plugins.aconex.client.http;
+package com.lucidworks.connector.plugins.aconex.service.http;
 
 import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
+import com.lucidworks.connector.plugins.aconex.service.http.AconexHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

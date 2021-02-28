@@ -1,8 +1,9 @@
-package com.lucidworks.connector.plugins.aconex.client;
+package com.lucidworks.connector.plugins.aconex.service;
 
 import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
+import com.lucidworks.connector.plugins.aconex.service.AconexService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -48,7 +49,7 @@ class AconexServiceTest {
         when(authProps.password()).thenReturn("Auth3nt1c");
 
         client = new AconexService(authenticationProperties.auth(), timeoutProperties.timeout(), additionalProperties.additional());
-        Object content = client.getContent();
+        Object content = client.getDocuments();
 
         assertNotNull(content);
     }

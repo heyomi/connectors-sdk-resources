@@ -1,10 +1,11 @@
-package com.lucidworks.connector.plugins.aconex.client.rest;
+package com.lucidworks.connector.plugins.aconex.service.rest;
 
+import com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
-import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.DEFAULT_PAGE_SIZE;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_SIZE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 

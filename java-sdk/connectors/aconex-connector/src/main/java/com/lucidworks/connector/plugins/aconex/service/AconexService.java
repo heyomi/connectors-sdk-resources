@@ -1,15 +1,17 @@
-package com.lucidworks.connector.plugins.aconex.client;
+package com.lucidworks.connector.plugins.aconex.service;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClient;
+import com.lucidworks.connector.plugins.aconex.client.AconexClient;
+import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.Project;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
+import com.lucidworks.connector.plugins.aconex.service.http.AconexHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class AconexService {
+public class AconexService implements AconexClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexService.class);
     private final AconexHttpClient httpClient;
     private final LoadingCache<String, ProjectList> projectListCache;
@@ -33,7 +35,14 @@ public class AconexService {
         this.projectListCache = getProjectsCache(apiEndpoint);
     }
 
-    public Map<String, Map<String, Object>> getContent() {
+    public AconexService(AconexConfig config) {
+        this.httpClient = new AconexHttpClient(config);
+        this.apiEndpoint = httpClient.getApiEndpoint();
+        this.projectListCache = getProjectsCache(apiEndpoint);
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getDocuments() {
         logger.info("Getting content...");
 
         Map<String, Map<String, Object>> content = new HashMap<>();

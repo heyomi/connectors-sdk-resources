@@ -1,9 +1,10 @@
-package com.lucidworks.connector.plugins.aconex.client.http;
+package com.lucidworks.connector.plugins.aconex.service.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
-import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
+import com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder;
 import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
@@ -37,7 +38,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
 
-import static com.lucidworks.connector.plugins.aconex.config.AconexConstants.IMAGE_FILE_TYPE;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.DOC_FILE_TYPE;
 
 public class AconexHttpClient {
 
@@ -51,6 +52,12 @@ public class AconexHttpClient {
         this.httpClient = createHttpClient(auth.username(), auth.password(), timeout.connectTimeoutMs());
         this.apiEndpoint = auth.instanceUrl() + "/api";
         this.fileTypes = additional.fileType();
+    }
+
+    public AconexHttpClient(AconexConfig config) {
+        this.httpClient = createHttpClient(config.properties().auth().username(), config.properties().auth().password(), config.properties().timeout().connectTimeoutMs());
+        this.apiEndpoint = config.properties().auth().instanceUrl() + "/api";
+        this.fileTypes = config.properties().additional().fileType();
     }
 
     private HttpClient createHttpClient(String username, String password, int connectionTimeout) {
@@ -211,8 +218,9 @@ public class AconexHttpClient {
             logger.info("Applying file type [{}] document filter", fileTypes);
             documents.removeIf(doc -> !fileTypes.contains(doc.getFileType().toLowerCase()));
         } else {
-            logger.info("Applying image file type documents");
-            documents.removeIf(doc -> IMAGE_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
+            // logger.info("Applying image file type documents");
+            // documents.removeIf(doc -> IMAGE_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
+            documents.removeIf(doc -> !DOC_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
         }
 
         return documents;

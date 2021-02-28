@@ -1,6 +1,6 @@
 package com.lucidworks.connector.plugins.aconex.fetcher;
 
-import com.lucidworks.connector.plugins.aconex.client.AconexService;
+import com.lucidworks.connector.plugins.aconex.client.AconexClient;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.FetchResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StartResult;
@@ -21,14 +21,12 @@ public class AconexFetcher implements ContentFetcher {
   private static final Logger logger = LoggerFactory.getLogger(AconexFetcher.class);
 
   // private final ProcessorRunner processorRunner;
-
-  private final AconexConfig config;
-  private final AconexService service;
+  private final AconexClient client;
 
   @Inject
-  public AconexFetcher(AconexConfig config) {
-    this.config = config;
-    this.service = new AconexService(config.properties().auth(), config.properties().timeout(), config.properties().additional());
+  public AconexFetcher(AconexClient client, AconexConfig config) {
+    // this.client = new AconexService(config.properties().auth(), config.properties().timeout(), config.properties().additional());
+    this.client = client;
   }
 
   @Override
@@ -49,7 +47,7 @@ public class AconexFetcher implements ContentFetcher {
     logger.trace("Fetching input={}", input);
 
     try {
-      Map<String, Map<String, Object>> content = service.getContent();
+      Map<String, Map<String, Object>> content = client.getDocuments();
 
       if (content != null && !content.isEmpty()) {
 
