@@ -6,7 +6,7 @@ import lombok.NonNull;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
-import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_SIZE;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
 public class RestApiUriBuilder {
 
@@ -14,16 +14,23 @@ public class RestApiUriBuilder {
         return UriBuilder.fromPath(apiRootPath).path(Constants.PROJECTS).build();
     }
 
-    public static URI buildDocumentsUri(@NonNull String apiRootPath, String projectId) {
+    public static URI buildDocumentsUri(@NonNull String apiRootPath, @NonNull String projectId) {
+        return buildDocumentsUri(apiRootPath, projectId, DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
+    }
+
+    public static URI buildDocumentsUri(@NonNull String apiRootPath, @NonNull String projectId, int pageNumber, int pageSize) {
+        if (pageSize == 0 || pageNumber == 0)
+            return buildDocumentsUri(apiRootPath, projectId);
+
         UriBuilder uriBuilder = UriBuilder.fromPath(apiRootPath)
                 .path(Constants.PROJECTS)
                 .path(projectId)
                 .path(Constants.REGISTER);
 
-        uriBuilder.queryParam(Constants.PARAM_SEARCH_TYPE, Constants.SEARCH_TYPE_PAGED);
-        uriBuilder.queryParam(Constants.PARAM_PAGE_SIZE, DEFAULT_PAGE_SIZE);
-        uriBuilder.queryParam(Constants.PARAM_PAGE_NUMBER, 1);
-        uriBuilder.queryParam(Constants.PARAM_RETURN_FIELDS, Constants.RETURN_FIELDS);
+        uriBuilder.queryParam(Constants.PARAM_SEARCH_TYPE, Constants.SEARCH_TYPE_PAGED)
+                .queryParam(Constants.PARAM_PAGE_SIZE, pageSize)
+                .queryParam(Constants.PARAM_PAGE_NUMBER, pageNumber)
+                .queryParam(Constants.PARAM_RETURN_FIELDS, Constants.RETURN_FIELDS);
 
         return uriBuilder.build();
     }

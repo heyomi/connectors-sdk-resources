@@ -14,7 +14,7 @@ public class RegisterSearch {
     @JacksonXmlProperty(localName = "SearchResults")
     private SearchResults searchResults;
     @JacksonXmlProperty(localName = "TotalResults")
-    private int totalResult;
+    private int totalResults;
     @JacksonXmlProperty(localName = "TotalResultsOnPage")
     private int totalResultsOnPage;
     @JacksonXmlProperty(localName = "TotalPages")

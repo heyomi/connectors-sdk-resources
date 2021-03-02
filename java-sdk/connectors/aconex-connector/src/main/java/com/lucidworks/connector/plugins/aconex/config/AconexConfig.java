@@ -13,14 +13,15 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.RootSchema;
 public interface AconexConfig extends ConnectorConfig<AconexConfig.Properties> {
 
     @Property(
-            title = "Aconex properties",
-            required = true
+            title = "Properties",
+            required = true,
+            order = 1
     )
-    AconexConfig.Properties properties();
+    Properties properties();
 
-    interface Properties extends ConnectorPluginProperties,
-            TimeoutProperties,
-            AuthenticationProperties,
-            AdditionalProperties {
+    /**
+     * Connector specific settings
+     */
+    interface Properties extends ConnectorPluginProperties, AconexProperties {
     }
 }

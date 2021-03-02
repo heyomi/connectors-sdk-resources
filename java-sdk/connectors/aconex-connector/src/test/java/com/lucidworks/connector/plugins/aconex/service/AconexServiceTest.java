@@ -1,9 +1,7 @@
 package com.lucidworks.connector.plugins.aconex.service;
 
-import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
-import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
-import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
-import com.lucidworks.connector.plugins.aconex.service.AconexService;
+import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
+import com.lucidworks.connector.plugins.aconex.config.AconexProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -16,39 +14,33 @@ class AconexServiceTest {
     AconexService client;
 
     @Mock
-    AuthenticationProperties authenticationProperties;
+    AconexProperties.AuthenticationProperties authProps;
 
     @Mock
-    TimeoutProperties timeoutProperties;
+    AconexProperties.TimeoutProperties timeoutProps;
 
     @Mock
-    AdditionalProperties additionalProperties;
+    AconexConfig.Properties properties;
 
     @Mock
-    AuthenticationProperties.Properties authProps;
-
-    @Mock
-    TimeoutProperties.Properties timeoutProps;
-
-    @Mock
-    AdditionalProperties.Properties addProps;
+    AconexConfig config;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         when(authProps.instanceUrl()).thenReturn("https://apidev.aconex.com");
         when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
-        when(authenticationProperties.auth()).thenReturn(authProps);
-        when(timeoutProperties.timeout()).thenReturn(timeoutProps);
-        when(additionalProperties.additional()).thenReturn(addProps);
+        when(properties.auth()).thenReturn(authProps);
+        when(properties.timeout()).thenReturn(timeoutProps);
+        when(config.properties()).thenReturn(properties);
     }
 
     @Test
     void getContent() {
-        when(authProps.username()).thenReturn("poleary");
+        when(authProps.username()).thenReturn("dmori");
         when(authProps.password()).thenReturn("Auth3nt1c");
 
-        client = new AconexService(authenticationProperties.auth(), timeoutProperties.timeout(), additionalProperties.additional());
+        client = new AconexService(config);
         Object content = client.getDocuments();
 
         assertNotNull(content);

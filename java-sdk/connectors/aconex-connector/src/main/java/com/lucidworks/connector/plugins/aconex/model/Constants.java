@@ -10,11 +10,22 @@ public class Constants {
     public static final String PARAM_PAGE_NUMBER = "page_number";
     public static final String PARAM_RETURN_FIELDS = "return_fields";
 
-    public static final int DEFAULT_PAGE_SIZE = 250;
+    public static final int DEFAULT_PAGE_SIZE = 25;
+    public static final int DEFAULT_PAGE_SIZE_DIVISOR = 25;
+    public static final int DEFAULT_PAGE_NUMBER = 1;
     public static final String SEARCH_TYPE_PAGED = "PAGED";
     public static final String RETURN_FIELDS = "title,filename,author,doctype,fileSize,fileType,confidential,statusid";
 
     public static final int TIMEOUT_MS = 10000;
     public static final String IMAGE_FILE_TYPE = "jpg,jpeg,png,gif";
     public static final String DOC_FILE_TYPE = "pdf,doc,txt,xls";
+
+    public static final String CHECKPOINT_PREFIX = "checkpoint_prefix";
+    public static final String TOTAL_INDEXED = "total_indexed";
+    public static final String TOTAL_PAGES = "total_pages";
+    public static final String TOTAL_RESULTS = "total_results";
+    public static final String TOTAL_ON_PAGE = "total_on_page";
+    public static final String PAGE_NUMBER = "page_number";
+    public static final String PAGE_SIZE = "page_size";
+    public static final String COUNTER_FIELD = "number";
 }

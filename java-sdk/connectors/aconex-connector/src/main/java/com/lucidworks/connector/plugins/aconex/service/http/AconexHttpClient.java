@@ -4,14 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
+import com.lucidworks.connector.plugins.aconex.model.*;
 import com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder;
-import com.lucidworks.connector.plugins.aconex.config.AdditionalProperties;
-import com.lucidworks.connector.plugins.aconex.config.AuthenticationProperties;
-import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
-import com.lucidworks.connector.plugins.aconex.model.Document;
-import com.lucidworks.connector.plugins.aconex.model.ProjectList;
-import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
-import com.lucidworks.connector.plugins.aconex.model.SearchResults;
 import lombok.NonNull;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -31,13 +25,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.UnknownServiceException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
 
+import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_NUMBER;
 import static com.lucidworks.connector.plugins.aconex.model.Constants.DOC_FILE_TYPE;
 
 public class AconexHttpClient {
@@ -45,19 +39,16 @@ public class AconexHttpClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexHttpClient.class);
     private final HttpClient httpClient;
     private final String apiEndpoint;
-    private final String fileTypes;
+    private final List<String> fileTypes;
+    private final int pageSize;
     private String basicAuth;
-
-    public AconexHttpClient(AuthenticationProperties.Properties auth, TimeoutProperties.Properties timeout, AdditionalProperties.Properties additional) {
-        this.httpClient = createHttpClient(auth.username(), auth.password(), timeout.connectTimeoutMs());
-        this.apiEndpoint = auth.instanceUrl() + "/api";
-        this.fileTypes = additional.fileType();
-    }
+    private SearchResultsStats stats;
 
     public AconexHttpClient(AconexConfig config) {
         this.httpClient = createHttpClient(config.properties().auth().username(), config.properties().auth().password(), config.properties().timeout().connectTimeoutMs());
         this.apiEndpoint = config.properties().auth().instanceUrl() + "/api";
-        this.fileTypes = config.properties().additional().fileType();
+        this.fileTypes = config.properties().fileTypes();
+        this.pageSize = config.properties().documentsPerPage();
     }
 
     private HttpClient createHttpClient(String username, String password, int connectionTimeout) {
@@ -82,14 +73,14 @@ public class AconexHttpClient {
                     .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
                     .build();
 
-            HttpResponse<String> response = sendRequest(request);
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                throw new RuntimeException("Could not get project list: " + response.body());
+                logger.warn("An error occurred while getting project list. Aconex API response: {}", response.statusCode());
+            } else {
+                projectList = new Gson().fromJson(response.body(), ProjectList.class);
+                logger.info("Total projects found: {}", projectList.getSearchResults().size());
             }
-
-            projectList = new Gson().fromJson(response.body(), ProjectList.class);
-            logger.info("Total number of projects found:{}", projectList.getSearchResults().size());
         } catch (IOException e) {
             logger.error("An error occurred while getting project list", e);
         } catch (InterruptedException e) {
@@ -101,22 +92,27 @@ public class AconexHttpClient {
     }
 
     public List<Document> getDocuments(String projectId) {
-        logger.info("Getting document IDs...");
+        return getDocuments(projectId, 1);
+    }
 
-        // TODO: Create PAGED logic
+    public List<Document> getDocuments(@NonNull String projectId, int pageNumber) {
+        logger.info("Getting documents in project: {}, page: {}", projectId, pageNumber);
+
         List<Document> documents = new ArrayList<>();
+        if (pageNumber < 1) pageNumber = DEFAULT_PAGE_NUMBER;
+
         try {
-            final URI uri = RestApiUriBuilder.buildDocumentsUri(apiEndpoint, projectId);
+            final URI uri = RestApiUriBuilder.buildDocumentsUri(apiEndpoint, projectId, pageNumber, pageSize);
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(uri)
                     .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
                     .build();
 
-            HttpResponse<String> response = sendRequest(request);
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                logger.warn("An error occurred while accessing project #{}, response: {}", projectId, response.body());
+                logger.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response.statusCode());
             } else {
                 documents = getDocumentsFromXML(response.body());
             }
@@ -126,6 +122,8 @@ public class AconexHttpClient {
             logger.error("An error occurred while project list", e);
             Thread.currentThread().interrupt();
         }
+
+        logger.info("{} documents crawled from project:{}", documents.size(), projectId);
 
         return documents;
     }
@@ -142,17 +140,8 @@ public class AconexHttpClient {
 
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-            if (response.statusCode() == 401) {
-                throw new NotAuthorizedException(Arrays.toString(response.body()));
-            }
-
-            if (response.statusCode() == 403) {
-                throw new ForbiddenException(Arrays.toString(response.body()));
-            }
-
             if (response.statusCode() != 200) {
-                logger.warn("An error occurred while accessing project #{}, response: {}", projectId, response.body());
-                throw new UnknownServiceException(Arrays.toString(response.body()));
+                logger.warn("An error occurred while accessing document:{} in project:{}. Aconex API response: {}", documentId, projectId, response.statusCode());
             } else {
                 content = parseDocument(response.body());
             }
@@ -210,11 +199,12 @@ public class AconexHttpClient {
 
     private List<Document> getDocumentsFromXML(String xml) throws JsonProcessingException {
         XmlMapper xmlMapper = new XmlMapper();
-        RegisterSearch value = xmlMapper.readValue(xml, RegisterSearch.class);
-        SearchResults result = value.getSearchResults();
+        RegisterSearch registerSearch = xmlMapper.readValue(xml, RegisterSearch.class);
+        SearchResults result = registerSearch.getSearchResults();
         List<Document> documents = result.getDocuments();
+        setStats(registerSearch);
 
-        if (fileTypes != null) {
+        if (fileTypes != null && !fileTypes.isEmpty()) {
             logger.info("Applying file type [{}] document filter", fileTypes);
             documents.removeIf(doc -> !fileTypes.contains(doc.getFileType().toLowerCase()));
         } else {
@@ -236,5 +226,17 @@ public class AconexHttpClient {
 
     public String getApiEndpoint() {
         return apiEndpoint;
+    }
+
+    public SearchResultsStats getStats() {
+        return stats;
+    }
+
+    public void setStats(SearchResultsStats stats) {
+        this.stats = stats;
+    }
+
+    public void setStats(RegisterSearch registerSearch) {
+        this.stats = new SearchResultsStats(registerSearch);
     }
 }
