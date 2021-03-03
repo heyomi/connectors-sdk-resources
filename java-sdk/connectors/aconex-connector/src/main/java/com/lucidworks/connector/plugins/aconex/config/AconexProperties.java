@@ -1,68 +1,61 @@
 package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
-import com.lucidworks.fusion.schema.SchemaAnnotations;
-import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
+import com.lucidworks.fusion.schema.SchemaAnnotations.ArraySchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
+import com.lucidworks.fusion.schema.SchemaAnnotations.NumberSchema;
+import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
+import com.lucidworks.fusion.schema.UIHints;
 
 import java.util.List;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_SIZE;
 
 public interface AconexProperties extends Model {
-    @Property(
-            title = "Authentication Properties",
-            description = "Aconex Authentication Properties",
-            required = true,
-            order = 1
-    )
-    AuthenticationProperties auth();
+
+    @Property(title = "Host", required = true, description = "The Aconex hostname. E.g. https://host.aconex.com", order = 1)
+    @StringSchema(minLength = 1)
+    String host();
 
     @Property(
-            title = "Timeout Properties",
-            description = "Timeout Properties",
-            required = true,
-            order = 2
+            title = "Authentication settings",
+            description = "Select only one option",
+            order = 2,
+            required = true
+    )
+    AuthenticationConfig auth();
+
+    @Property(
+            title = "HTTP Timeout Options",
+            description = "A set of options for configuring the HTTP client timeout in milliseconds.",
+            order = 4,
+            hints = { UIHints.ADVANCED }
     )
     TimeoutProperties timeout();
 
-    @Property(title = "Incremental Total", description = "Total number of docs to generate from the second and subsequent crawls.")
-    @SchemaAnnotations.NumberSchema(defaultValue = DEFAULT_PAGE_SIZE)
-    Integer documentsPerPage();
+    @Property(title = "Default Request Page Size", description = "Total number of docs to generate from the second and subsequent crawls.", hints = { UIHints.ADVANCED })
+    @NumberSchema(defaultValue = DEFAULT_PAGE_SIZE)
+    int documentsPerPage();
 
-    @Property(title = "Inclusive File Types", description = "Document types that should be crawled.")
-    @StringSchema(minLength = 1)
+    @Property(title = "Include Documents by File Types", description = "This will limit this datasource to only these file types.", hints = { UIHints.ADVANCED })
+    @ArraySchema(minItems = 1)
     List<String> fileTypes();
 
     @Property(
             title = "Aconex Projects",
             description = "List of Aconex Project IDs to crawl.",
-            order = 2
+            order = 3
     )
-    @SchemaAnnotations.ArraySchema(minItems = 1)
+    @ArraySchema(minItems = 1)
     List<String> projects();
 
-    interface AuthenticationProperties extends Model {
-        @Property(title = "Instance URL", required = true, description = "URL of your Aconex instance")
-        @StringSchema(minLength = 1)
-        String instanceUrl();
-
-        @Property(title = "Username", required = true)
-        @StringSchema(minLength = 1)
-        String username();
-
-        @Property(title = "Password", required = true)
-        @StringSchema(encrypted = true)
-        String password();
-    }
-
     interface TimeoutProperties extends Model {
-        @Property(order = 1)
-        @SchemaAnnotations.NumberSchema(defaultValue = 5 * 60 * 1000, minimum = 0, maximum = 10 * 60 * 1000)
+        @Property(title = "Read Timeout", order = 1)
+        @NumberSchema(defaultValue = 5 * 60 * 1000, minimum = 0, maximum = 10 * 60 * 1000)
         int readTimeoutMs();
 
-        @Property(order = 2)
-        @SchemaAnnotations.NumberSchema(defaultValue = 60 * 1000, minimum = 0, maximum = 5 * 60 * 1000)
+        @Property(title = "Connection Timeout", order = 2)
+        @NumberSchema(defaultValue = 60 * 1000, minimum = 0, maximum = 5 * 60 * 1000)
         int connectTimeoutMs();
     }
 }

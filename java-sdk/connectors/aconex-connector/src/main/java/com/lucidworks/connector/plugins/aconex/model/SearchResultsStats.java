@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +17,8 @@ public class SearchResultsStats {
     private int totalPages;
     private int pageSize;
     private int currentPage;
+    private int totalProjects;
+    private List<String> projectIds;
 
     public SearchResultsStats(RegisterSearch registerSearch) {
         this.totalResults = registerSearch.getTotalResults();

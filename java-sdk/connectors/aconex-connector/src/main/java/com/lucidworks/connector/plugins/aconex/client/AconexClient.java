@@ -6,6 +6,7 @@ import java.util.Map;
 
 public interface AconexClient {
     Map<String, Map<String, Object>> getDocuments();
-    Map<String, Map<String, Object>> getDocuments(int pageNumber);
+    Map<String, Map<String, Object>> getDocuments(int pageNumber, int pageSize);
+    Map<String, Map<String, Object>> getDocumentsByProject(String projectId, int pageNumber, int pageSize);
     SearchResultsStats getSearchResultsStats();
 }

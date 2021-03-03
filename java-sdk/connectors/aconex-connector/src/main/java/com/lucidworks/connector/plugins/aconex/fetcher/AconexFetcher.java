@@ -33,14 +33,13 @@ public class AconexFetcher implements ContentFetcher {
     // private final ProcessorRunner processorRunner;
     private final AconexClient client;
     private final AconexConfig config;
-    private final List<String> projects;
+    private List<String> projects;
 
     @Inject
     public AconexFetcher(AconexClient client, AconexConfig config) {
         // this.client = new AconexService(config.properties().auth(), config.properties().timeout(), config.properties().additional());
         this.client = client;
         this.config = config;
-        this.projects = config.properties().projects();
     }
 
     @Override
@@ -78,11 +77,13 @@ public class AconexFetcher implements ContentFetcher {
                 }
                 return context.newResult();
             }*/
-            handleDocuments(context, input);
+            logger.info("HERE");
+            handlePageDocuments(context, input, config.properties().projects().get(0), 1);
         } catch (Exception e) {
             context.newError(input.getId(), String.format(ERROR_MSG, input.getId(), e.getMessage())).emit();
         }
 
+        logger.info("HERE 2");
         return context.newResult();
 
         // return processorRunner.process(ctx, input);
@@ -122,11 +123,51 @@ public class AconexFetcher implements ContentFetcher {
                         })
                         .emit();
             }
-        } else {
-            context.newError(input.getId(), "Failed to store all Aconex Content.").emit();
         }
 
         // Checkpoint
         // emitCheckpoint(context, stats.getCurrentPage(), stats.getTotalResults(), stats.getTotalPages(), stats.getTotalResultsOnPage());
+    }
+
+    private void createNewDocuments(FetchContext context, Map<String, Map<String, Object>> content) {
+        logger.info("creating doc");
+
+        for (String key : content.keySet()) {
+            Map<String, Object> data = content.get(key);
+
+            logger.info("creating doc key:{}", key);
+
+            context.newDocument(key)
+                    .fields(f -> {
+                        f.setString("url", key); // TODO: Figure out how to get document URL from Aconex]
+                        f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
+                        f.setLong("lastUpdated", ZonedDateTime.now().toEpochSecond());
+                        f.setString(TYPE_FIELD, "doc");
+                        f.setString(PROJECT_ID_FIELD, data.get("project:id").toString());
+                        f.setString(DOCUMENT_ID_FIELD, data.get("document:id").toString());
+                        f.merge(data);
+                    })
+                    .emit();
+        }
+    }
+
+    private void handlePageDocuments(FetchContext context, FetchInput input, String projectId, int pageNumber){
+        logger.info("context:{}", context);
+        logger.info("project:{}", projectId);
+        logger.info("page:{}", pageNumber);
+
+
+        int pageSize = config.properties().documentsPerPage();
+        Map<String, Map<String, Object>> content = client.getDocumentsByProject(projectId, pageNumber, pageSize);
+        SearchResultsStats stats = client.getSearchResultsStats();
+        createNewDocuments(context, content);
+
+        while (stats.getTotalPages() > stats.getCurrentPage()) {
+            logger.info("stats:{}", stats);
+
+            content = client.getDocumentsByProject(projectId, pageNumber + 1, pageSize);
+            stats = client.getSearchResultsStats();
+            createNewDocuments(context, content);
+        }
     }
 }
