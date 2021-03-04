@@ -107,6 +107,7 @@ public class AconexService implements AconexClient {
                 if (document != null && !document.isEmpty()) {
                     document.put("url", buildDocumentViewerUri(projectId, d.getId()));
                     document.put(TYPE_FIELD, "document");
+                    document.put(PROJECT_NAME_FIELD, projectId); //TODO: Fix this
                     document.put(PROJECT_ID_FIELD, projectId);
                     document.put(DOCUMENT_ID_FIELD, d.getId());
                     content.put(projectId + ":" + d.getId(), document);
@@ -141,7 +142,7 @@ public class AconexService implements AconexClient {
             //getting metadata of the document
             String[] metadataNames = metadata.names();
             for (String name : metadataNames) {
-                content.put(name, metadata.get(name));
+                content.put(name.replace(":", "_"), metadata.get(name));
             }
         } catch (IOException | SAXException | TikaException e) {
             logger.error(e.getMessage());
@@ -204,6 +205,8 @@ public class AconexService implements AconexClient {
     private AconexHttpClient setClient(AconexConfig config) {
         return new AconexHttpClient(new AconexHttpClientOptions(
                 config.properties().host(),
+                config.properties().apiKey(),
+                AconexHttpClientOptions.AuthType.BASIC,
                 config.properties().auth().basic().username(),
                 config.properties().auth().basic().password(),
                 config.properties().timeout().connectTimeoutMs()

@@ -17,10 +17,14 @@ public interface AconexProperties extends Model {
     @StringSchema(minLength = 1)
     String host();
 
+    @Property(title = "API Key", required = true, description = "The Aconex API Application Key.", order = 2)
+    @StringSchema(minLength = 1)
+    String apiKey();
+
     @Property(
             title = "Authentication settings",
             description = "Select only one option",
-            order = 2,
+            order = 3,
             required = true
     )
     AuthenticationConfig auth();
@@ -28,7 +32,7 @@ public interface AconexProperties extends Model {
     @Property(
             title = "HTTP Timeout Options",
             description = "A set of options for configuring the HTTP client timeout in milliseconds.",
-            order = 4,
+            order = 5,
             hints = { UIHints.ADVANCED }
     )
     TimeoutProperties timeout();
@@ -44,7 +48,8 @@ public interface AconexProperties extends Model {
     @Property(
             title = "Aconex Projects",
             description = "List of Aconex Project IDs to crawl.",
-            order = 3
+            order = 4,
+            hints = { UIHints.ADVANCED }
     )
     @ArraySchema(minItems = 1)
     List<String> projects();

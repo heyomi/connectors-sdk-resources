@@ -5,6 +5,7 @@ public class Constants {
     public static final String REGISTER = "register";
     public static final String MARKEDUP = "markedup";
 
+    public static final String HTTP_HEADER_APPLICATION_KEY = "X-Application-Key";
     public static final String PARAM_SEARCH_TYPE = "search_type";
     public static final String PARAM_PAGE_SIZE = "page_size";
     public static final String PARAM_PAGE_NUMBER = "page_number";

@@ -19,17 +19,18 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Base64;
 
-import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_NUMBER;
-import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_SIZE;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
 public class AconexHttpClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AconexHttpClient.class);
+    private final AconexHttpClientOptions options;
     private final HttpClient httpClient;
     private final String apiEndpoint;
     private String basicAuth;
 
     public AconexHttpClient(AconexHttpClientOptions options) {
+        this.options = options;
         this.httpClient = createHttpClient(options);
         this.apiEndpoint = options.getHostname() + "/api";
     }
@@ -54,6 +55,7 @@ public class AconexHttpClient {
                     .uri(uri)
                     .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                     .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
+                    .setHeader(HTTP_HEADER_APPLICATION_KEY, options.getApiKey())
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -90,6 +92,7 @@ public class AconexHttpClient {
                     .GET()
                     .uri(uri)
                     .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
+                    .setHeader(HTTP_HEADER_APPLICATION_KEY, options.getApiKey())
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -118,6 +121,7 @@ public class AconexHttpClient {
                     .GET()
                     .uri(uri)
                     .setHeader(HttpHeaders.AUTHORIZATION, getBasicAuth())
+                    .setHeader(HTTP_HEADER_APPLICATION_KEY, options.getApiKey())
                     .build();
 
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
