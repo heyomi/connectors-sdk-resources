@@ -23,11 +23,6 @@ import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 public class AconexFetcher implements ContentFetcher {
 
     private static final Logger logger = LoggerFactory.getLogger(AconexFetcher.class);
-
-    private static final String TYPE_FIELD = "_aconex_type";
-    private static final String PROJECT_ID_FIELD = "_aconex_project_id";
-    private static final String DOCUMENT_ID_FIELD = "_aconex_document_id";
-    private static final String CANDIDATE_ID = "%s-%s";
     private static final String ERROR_MSG = "Item=%s failed with error=%s";
 
     // private final ProcessorRunner processorRunner;
@@ -74,18 +69,61 @@ public class AconexFetcher implements ContentFetcher {
                             )
                             .emit();
                 }
+
                 return context.newResult();
             }*/
-            logger.info("HERE");
-            handlePageDocuments(context, 1);
+
+            process(context);
         } catch (Exception e) {
             context.newError(input.getId(), String.format(ERROR_MSG, input.getId(), e.getMessage())).emit();
         }
-
-        logger.info("HERE 2");
         return context.newResult();
+    }
 
-        // return processorRunner.process(ctx, input);
+    private void process(FetchContext context){
+        int pageNumber = 1;
+
+        for (String id : client.getProjectIds()) {
+            handleProject(context, id);
+            int pageSize = config.properties().documentsPerPage();
+            Map<String, Map<String, Object>> content = client.getDocumentsByProject(id, pageNumber, pageSize);
+            SearchResultsStats stats = client.getSearchResultsStats();
+            createNewDocuments(context, content);
+
+            while (stats.getTotalPages() > stats.getCurrentPage()) {
+                logger.info("stats:{}", stats);
+
+                content = client.getDocumentsByProject(id, pageNumber + 1, pageSize);
+                stats = client.getSearchResultsStats();
+                createNewDocuments(context, content);
+            }
+        }
+    }
+
+    private void handleProject(FetchContext context, String project) {
+        logger.info("emitting project: {}", project);
+        context.newCandidate(project)
+                .withIsLeafNode(false)
+                .withTransient(true)
+                .metadata(m -> {
+                            m.setString(TYPE_FIELD, "project");
+                            m.setString(PROJECT_ID_FIELD, project);
+                        }
+                )
+                .emit();
+    }
+
+    private void createNewDocuments(FetchContext context, Map<String, Map<String, Object>> content) {
+        content.keySet().forEach(key -> {
+            Map<String, Object> data = content.get(key);
+            logger.info("creating doc key:{}", key);
+            context.newDocument(key)
+                    .fields(f -> {
+                        f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
+                        f.merge(data);
+                    })
+                    .emit();
+        });
     }
 
     private void emitCheckpoint(FetchContext context, int pageNumber, int totalResults, int totalPages, int totalOnPage) {
@@ -101,64 +139,5 @@ public class AconexFetcher implements ContentFetcher {
                     m.setLong("lastJobRunDateTime", ZonedDateTime.now().toEpochSecond());
                 })
                 .emit();
-    }
-
-    private void handleDocuments(FetchContext context, FetchInput input) {
-        Map<String, Map<String, Object>> content = client.getDocuments();
-        SearchResultsStats stats = client.getSearchResultsStats();
-        logger.debug(stats.toString());
-
-        if (content != null && !content.isEmpty()) {
-            for (String key : content.keySet()) {
-                Map<String, Object> data = content.get(key);
-                context.newDocument(key)
-                        .fields(f -> {
-                            f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
-                            f.merge(data);
-                        })
-                        .emit();
-            }
-        }
-
-        // Checkpoint
-        // emitCheckpoint(context, stats.getCurrentPage(), stats.getTotalResults(), stats.getTotalPages(), stats.getTotalResultsOnPage());
-    }
-
-    private void createNewDocuments(FetchContext context, Map<String, Map<String, Object>> content) {
-        logger.info("creating doc");
-
-        for (String key : content.keySet()) {
-            Map<String, Object> data = content.get(key);
-
-            logger.info("creating doc key:{}", key);
-
-            context.newDocument(key)
-                    .fields(f -> {
-                        f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
-                        f.setLong("lastUpdated", ZonedDateTime.now().toEpochSecond());
-                        f.merge(data);
-                    })
-                    .emit();
-        }
-    }
-
-    private void handlePageDocuments(FetchContext context, int pageNumber){
-        String projectId = client.getProjectIds().get(0);
-        logger.info("context:{}", context);
-        logger.info("project:{}", projectId);
-        logger.info("page:{}", pageNumber);
-
-        int pageSize = config.properties().documentsPerPage();
-        Map<String, Map<String, Object>> content = client.getDocumentsByProject(projectId, pageNumber, pageSize);
-        SearchResultsStats stats = client.getSearchResultsStats();
-        createNewDocuments(context, content);
-
-        while (stats.getTotalPages() > stats.getCurrentPage()) {
-            logger.info("stats:{}", stats);
-
-            content = client.getDocumentsByProject(projectId, pageNumber + 1, pageSize);
-            stats = client.getSearchResultsStats();
-            createNewDocuments(context, content);
-        }
     }
 }
