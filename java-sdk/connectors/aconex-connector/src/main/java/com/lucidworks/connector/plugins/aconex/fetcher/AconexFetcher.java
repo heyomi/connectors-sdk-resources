@@ -37,7 +37,6 @@ public class AconexFetcher implements ContentFetcher {
 
     @Inject
     public AconexFetcher(AconexClient client, AconexConfig config) {
-        // this.client = new AconexService(config.properties().auth(), config.properties().timeout(), config.properties().additional());
         this.client = client;
         this.config = config;
     }
@@ -78,7 +77,7 @@ public class AconexFetcher implements ContentFetcher {
                 return context.newResult();
             }*/
             logger.info("HERE");
-            handlePageDocuments(context, input, config.properties().projects().get(0), 1);
+            handlePageDocuments(context, 1);
         } catch (Exception e) {
             context.newError(input.getId(), String.format(ERROR_MSG, input.getId(), e.getMessage())).emit();
         }
@@ -114,11 +113,7 @@ public class AconexFetcher implements ContentFetcher {
                 Map<String, Object> data = content.get(key);
                 context.newDocument(key)
                         .fields(f -> {
-                            f.setString("url", key); // TODO: Figure out how to get document URL from Aconex]
                             f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
-                            f.setString(TYPE_FIELD, "doc");
-                            f.setString(PROJECT_ID_FIELD, data.get("project:id").toString());
-                            f.setString(DOCUMENT_ID_FIELD, data.get("document:id").toString());
                             f.merge(data);
                         })
                         .emit();
@@ -139,23 +134,19 @@ public class AconexFetcher implements ContentFetcher {
 
             context.newDocument(key)
                     .fields(f -> {
-                        f.setString("url", key); // TODO: Figure out how to get document URL from Aconex]
                         f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
                         f.setLong("lastUpdated", ZonedDateTime.now().toEpochSecond());
-                        f.setString(TYPE_FIELD, "doc");
-                        f.setString(PROJECT_ID_FIELD, data.get("project:id").toString());
-                        f.setString(DOCUMENT_ID_FIELD, data.get("document:id").toString());
                         f.merge(data);
                     })
                     .emit();
         }
     }
 
-    private void handlePageDocuments(FetchContext context, FetchInput input, String projectId, int pageNumber){
+    private void handlePageDocuments(FetchContext context, int pageNumber){
+        String projectId = client.getProjectIds().get(0);
         logger.info("context:{}", context);
         logger.info("project:{}", projectId);
         logger.info("page:{}", pageNumber);
-
 
         int pageSize = config.properties().documentsPerPage();
         Map<String, Map<String, Object>> content = client.getDocumentsByProject(projectId, pageNumber, pageSize);

@@ -44,4 +44,8 @@ public class RestApiUriBuilder {
                 .path(Constants.MARKEDUP)
                 .build();
     }
+
+    public static String buildDocumentViewerUri(@NonNull String projectId, @NonNull String documentId) {
+        return "https://app35.qa.acx/ViewDoc?docid=" + documentId + "&projectid=" + projectId;
+    }
 }

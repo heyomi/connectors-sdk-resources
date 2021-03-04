@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
+import static com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder.buildDocumentViewerUri;
 
 public class AconexService implements AconexClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexService.class);
@@ -95,20 +96,20 @@ public class AconexService implements AconexClient {
 
         List<Document> documents = getDocumentsFromXML(documentXmlResponse);
         logger.info("{} documents crawled from project:{}", documents.size(), projectId);
-
-        List<String> ids = documents.stream().map(Document::getId).collect(Collectors.toList());
         Map<String, Object> document;
 
-        for (String id : ids) {
-            byte[] doc = client.getDocument(projectId, id);
+        for (Document d : documents) {
+            byte[] doc = client.getDocument(projectId, d.getId());
 
             if (doc != null) {
                 document = parseDocument(doc);
 
                 if (document != null && !document.isEmpty()) {
-                    document.put("document:id", id);
-                    document.put("project:id", projectId);
-                    content.put(projectId + ":" + id, document);
+                    document.put("url", buildDocumentViewerUri(projectId, d.getId()));
+                    document.put(TYPE_FIELD, "document");
+                    document.put(PROJECT_ID_FIELD, projectId);
+                    document.put(DOCUMENT_ID_FIELD, d.getId());
+                    content.put(projectId + ":" + d.getId(), document);
                 }
             }
         }
@@ -116,6 +117,7 @@ public class AconexService implements AconexClient {
         return content;
     }
 
+    @Override
     public List<String> getProjectIds() {
         return getProjects().stream().map(Project::getProjectID).collect(Collectors.toList());
     }

@@ -28,4 +28,8 @@ public class Constants {
     public static final String PAGE_NUMBER = "page_number";
     public static final String PAGE_SIZE = "page_size";
     public static final String COUNTER_FIELD = "number";
+    public static final String TYPE_FIELD = "_aconex_type";
+    public static final String PROJECT_ID_FIELD = "_aconex_project_id";
+    public static final String PROJECT_NAME_FIELD = "_aconex_project_name";
+    public static final String DOCUMENT_ID_FIELD = "_aconex_document_id";
 }

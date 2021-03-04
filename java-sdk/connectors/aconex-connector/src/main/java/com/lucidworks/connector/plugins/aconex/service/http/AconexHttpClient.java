@@ -110,6 +110,7 @@ public class AconexHttpClient {
     }
 
     public byte[] getDocument(@NonNull String projectId, @NonNull String documentId) {
+        logger.debug("Getting doc:{}", documentId);
         byte[] content = null;
         try {
             final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(apiEndpoint, projectId, documentId);
