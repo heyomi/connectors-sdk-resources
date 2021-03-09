@@ -18,6 +18,7 @@ version '5.3.1'
 dependencies {
     implementation "com.lucidworks-connector.sdk:connector-plugin-sdk:${connectorsSDKVersion}"
     implementation "com.lucidworks-schema:schema:${connectorsSDKVersion}"
+    implementation fileTree('libs') { include '*.jar' }
 
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"

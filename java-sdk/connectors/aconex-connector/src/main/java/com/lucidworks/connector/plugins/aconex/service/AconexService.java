@@ -23,10 +23,7 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -67,7 +64,7 @@ public class AconexService implements AconexClient {
         List<String> projectIds = config.properties().projects();
 
         if (projectIds.isEmpty()) {
-            logger.warn("No project selected in configuration. All projects will be crawled.");
+            logger.info("No project selected in configuration. All projects will be crawled.");
             projectIds = getProjectIds();
         }
         this.stats.setProjectIds(projectIds);
@@ -95,10 +92,11 @@ public class AconexService implements AconexClient {
         }
 
         List<Document> documents = getDocumentsFromXML(documentXmlResponse);
-        logger.info("{} documents crawled from project:{}", documents.size(), projectId);
+        logger.info("{} documents available in project:{}/{}", documents.size(), projectId, pageNumber);
         Map<String, Object> document;
 
         for (Document d : documents) {
+            logger.info("doc:{}", d.getId());
             byte[] doc = client.getDocument(projectId, d.getId());
 
             if (doc != null) {
@@ -121,6 +119,28 @@ public class AconexService implements AconexClient {
     @Override
     public List<String> getProjectIds() {
         return getProjects().stream().map(Project::getProjectID).collect(Collectors.toList());
+    }
+
+
+    public Map<String, Map<String, Object>> getPagedDoc() {
+        int pageNumber = 1;
+        Map<String, Map<String, Object>> content = new HashMap<>();
+        List<String> ids = getProjectIds();
+        for (String id : ids) {
+            int pageSize = config.properties().item().pageSize();
+            content = getDocumentsByProject(id, pageNumber, pageSize);
+            SearchResultsStats results = getSearchResultsStats();
+            logger.info(results.toString());
+
+            while (results.getTotalPages() > results.getCurrentPage()) {
+                logger.info("stats:{}", results);
+
+                content = getDocumentsByProject(id, ++pageNumber, pageSize);
+                results = getSearchResultsStats();
+            }
+        }
+
+        return content;
     }
 
     private Map<String, Object> parseDocument(byte[] body) {
@@ -154,7 +174,9 @@ public class AconexService implements AconexClient {
     private List<Document> getDocumentsFromXML(String xml) {
         List<Document> documents = new ArrayList<>();
         try {
-            List<String> fileTypes = config.properties().fileTypes();
+            Set<String> includedFileExtensions = config.properties().item().includedFileExtensions();
+            Set<String> excludedFileExtensions = config.properties().item().excludedFileExtensions();
+
             XmlMapper xmlMapper = new XmlMapper();
             RegisterSearch registerSearch = xmlMapper.readValue(xml, RegisterSearch.class);
             SearchResults result = registerSearch.getSearchResults();
@@ -165,14 +187,25 @@ public class AconexService implements AconexClient {
                 documents = result.getDocuments();
                 setStats(registerSearch);
 
-                if (fileTypes != null && !fileTypes.isEmpty()) {
-                    logger.info("Applying file type [{}] document filter", fileTypes);
-                    documents.removeIf(doc -> !fileTypes.contains(doc.getFileType().toLowerCase()));
-                } else {
+                logger.info("{} files returned", documents.size());
+
+                if (includedFileExtensions != null && !includedFileExtensions.isEmpty()) {
+                    logger.info("Applying included file type [{}] document filter", includedFileExtensions);
+                    documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType().toLowerCase()));
+                }
+
+                if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
+                    logger.info("Applying excluded file type [{}] document filter", excludedFileExtensions);
+                    documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType().toLowerCase()));
+                }
+
+                else {
                     // logger.info("Applying image file type documents");
                     // documents.removeIf(doc -> IMAGE_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
                     documents.removeIf(doc -> !DOC_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
                 }
+
+                logger.info("{} files are valid documents ({})", documents.size(), DOC_FILE_TYPE);
             }
 
         } catch (JsonProcessingException e) {

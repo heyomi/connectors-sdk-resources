@@ -81,7 +81,7 @@ public class AconexHttpClient {
     }
 
     public String getDocuments(@NonNull String projectId, int pageNumber, int pageSize) {
-        logger.info("Getting documents in project: {}, page: {}", projectId, pageNumber);
+        logger.info("Getting documents in project: {}/{}", projectId, pageNumber);
 
         String documents = null;
         if (pageNumber < 1) pageNumber = DEFAULT_PAGE_NUMBER;

@@ -11,7 +11,7 @@ public class Constants {
     public static final String PARAM_PAGE_NUMBER = "page_number";
     public static final String PARAM_RETURN_FIELDS = "return_fields";
 
-    public static final int DEFAULT_PAGE_SIZE = 50;
+    public static final int DEFAULT_PAGE_SIZE = 25;
     public static final int DEFAULT_PAGE_SIZE_DIVISOR = 25;
     public static final int DEFAULT_PAGE_NUMBER = 1;
     public static final String SEARCH_TYPE_PAGED = "PAGED";
