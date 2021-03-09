@@ -48,15 +48,17 @@ public interface ItemLimitProperties extends Model {
 
     @Property(
             title = "Included file extensions",
-            description = "Set of file extensions to be fetched. If specified, all non-matching files will be skipped.")
+            description = "Set of file extensions to be fetched. If specified, all non-matching files will be skipped.",
+            order = 5)
     @ArraySchema(defaultValue = "[]")
-    @StringSchema(minLength = 5)
+    @StringSchema(minLength = 1)
     Set<String> includedFileExtensions();
 
     @Property(
             title = "Excluded file extensions",
-            description = "A set of all file extensions to be skipped from the fetch.")
+            description = "A set of all file extensions to be skipped from the fetch.",
+            order = 6)
     @ArraySchema(defaultValue = "[jpg, jpeg, png, gif, zip]")
-    @StringSchema(minLength = 6)
+    @StringSchema(minLength = 1)
     Set<String> excludedFileExtensions();
 }

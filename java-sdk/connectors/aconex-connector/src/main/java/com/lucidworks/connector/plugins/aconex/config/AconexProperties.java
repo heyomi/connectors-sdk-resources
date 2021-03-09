@@ -1,7 +1,7 @@
 package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
-import com.lucidworks.fusion.schema.SchemaAnnotations;
+import com.lucidworks.fusion.schema.SchemaAnnotations.ArraySchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 import com.lucidworks.fusion.schema.UIHints;
@@ -32,7 +32,7 @@ public interface AconexProperties extends Model {
             order = 4,
             hints = { UIHints.ADVANCED }
     )
-    @SchemaAnnotations.ArraySchema(minItems = 1)
+    @ArraySchema(minItems = 1)
     List<String> projects();
 
     @Property(

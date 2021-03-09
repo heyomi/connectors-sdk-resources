@@ -17,7 +17,7 @@ public class Document {
     private String documentStatus;
     private String documentType;
     @JacksonXmlProperty(localName = "FileSize")
-    private String fileSize;
+    private int fileSize;
     @JacksonXmlProperty(localName = "FileType")
     private String fileType;
     @JacksonXmlProperty(localName = "FileName")

@@ -176,6 +176,8 @@ public class AconexService implements AconexClient {
         try {
             Set<String> includedFileExtensions = config.properties().item().includedFileExtensions();
             Set<String> excludedFileExtensions = config.properties().item().excludedFileExtensions();
+            int maxFileSize = config.properties().item().maxSizeBytes();
+            int minFileSize = config.properties().item().minSizeBytes();
 
             XmlMapper xmlMapper = new XmlMapper();
             RegisterSearch registerSearch = xmlMapper.readValue(xml, RegisterSearch.class);
@@ -192,18 +194,26 @@ public class AconexService implements AconexClient {
                 if (includedFileExtensions != null && !includedFileExtensions.isEmpty()) {
                     logger.info("Applying included file type [{}] document filter", includedFileExtensions);
                     documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType().toLowerCase()));
-                }
-
-                if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
+                } else if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
                     logger.info("Applying excluded file type [{}] document filter", excludedFileExtensions);
                     documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType().toLowerCase()));
                 }
 
-                else {
+                if (maxFileSize > 0) {
+                    logger.info("Applying max file size [{}] document filter", maxFileSize);
+                    documents.removeIf(doc -> doc.getFileSize() > maxFileSize);
+                }
+
+                if (minFileSize > 0) {
+                    logger.info("Applying min file size [{}] document filter", minFileSize);
+                    documents.removeIf(doc -> doc.getFileSize() < minFileSize);
+                }
+
+                /* else {
                     // logger.info("Applying image file type documents");
                     // documents.removeIf(doc -> IMAGE_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
                     documents.removeIf(doc -> !DOC_FILE_TYPE.contains(doc.getFileType().toLowerCase()));
-                }
+                }*/
 
                 logger.info("{} files are valid documents ({})", documents.size(), DOC_FILE_TYPE);
             }
