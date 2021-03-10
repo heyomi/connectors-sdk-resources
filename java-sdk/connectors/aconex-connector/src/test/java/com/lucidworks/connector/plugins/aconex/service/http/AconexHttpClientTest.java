@@ -15,24 +15,24 @@ class AconexHttpClientTest {
     @Mock
     AconexHttpClientOptions options;
 
-    private final String apiEndpoint = "https://apidev.aconex.com/api";
-    private final String projectId = "1879048409";
-    private final String documentId = "271341877549097596";
-    private final String fileType = "pdf,doc";
+    private final String apiEndpoint = "https://uk1.aconex.co.uk/api";
+    private final String projectId = "268447644";
+    private final String documentId = "1348828088686947792";
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        when(options.getUsername()).thenReturn("poleary");
-        when(options.getPassword()).thenReturn("Auth3nt1c");
-        when(options.getHostname()).thenReturn("https://apidev.aconex.com");
+        when(options.getUsername()).thenReturn("Omar McKenzie");
+        when(options.getPassword()).thenReturn("F$/K#;E@dB32*yt:");
+        when(options.getHostname()).thenReturn("https://uk1.aconex.co.uk");
+        when(options.getApiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
         when(options.getConnectionTimeout()).thenReturn(30000);
 
         client = new AconexHttpClient(options);
     }
 
     @Test
-    void getProjectList() {
+    void shouldReturnProjectList() {
         ProjectList projects = client.getProjectList(apiEndpoint);
 
         assertNotNull(projects);
@@ -41,24 +41,22 @@ class AconexHttpClientTest {
     }
 
     @Test
-    void getDocuments() {
+    void shouldReturnDocuments() {
         String documents = client.getDocumentsByProject(projectId);
 
         assertNotNull(documents);
     }
 
     @Test
-    void getDocument() {
+    void shouldReturnDocumentContent() {
         byte[] document = client.getDocument(projectId, documentId);
 
         assertNotNull(document);
     }
 
     @Test
-    void getApiEndpoint() {
-        String api = client.getApiEndpoint();
-
-        assertEquals(api, "https://apidev.aconex.com/api");
+    void shouldReturnAPI() {
+        assertEquals(apiEndpoint, client.getApiEndpoint());
     }
 
     @Test

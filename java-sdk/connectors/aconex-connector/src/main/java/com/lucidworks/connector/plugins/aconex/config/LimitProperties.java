@@ -73,7 +73,7 @@ public interface LimitProperties extends Model {
             title = "Excluded file extensions",
             description = "A set of all file extensions to be skipped from the fetch.",
             order = 8)
-    @ArraySchema(defaultValue = "[jpg, jpeg, png, gif, zip]")
+    @ArraySchema(defaultValue = "[]")
     @StringSchema(minLength = 1)
     Set<String> excludedFileExtensions();
 }

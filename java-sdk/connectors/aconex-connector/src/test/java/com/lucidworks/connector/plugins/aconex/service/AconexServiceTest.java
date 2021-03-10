@@ -43,6 +43,8 @@ class AconexServiceTest {
         when(properties.auth()).thenReturn(authConfig);
         when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
         when(limitProperties.pageSize()).thenReturn(25);
+        when(limitProperties.write()).thenReturn(-1);
+        when(limitProperties.includeMetadata()).thenReturn(true);
         when(properties.auth().basic()).thenReturn(authProps);
         when(properties.timeout()).thenReturn(timeoutProps);
         when(config.properties()).thenReturn(properties);
@@ -99,7 +101,6 @@ class AconexServiceTest {
         Map<String, Map<String, Object>> content = service.getDocuments();
 
         assertNotNull(content);
-        assertTrue(content.size() > 0);
         assertTrue(content.size() < 25);
     }
 
@@ -113,8 +114,21 @@ class AconexServiceTest {
         Map<String, Map<String, Object>> content = service.getDocuments();
 
         assertNotNull(content);
-        assertTrue(content.size() > 0);
         assertTrue(content.size() < 25);
+    }
+
+    @Test
+    void shouldReturnDocumentsWithoutMetadata() {
+        when(authProps.username()).thenReturn("Omar McKenzie");
+        when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
+        when(limitProperties.includeMetadata()).thenReturn(false);
+
+        service = new AconexService(config);
+        Map<String, Map<String, Object>> content = service.getDocuments();
+
+        assertNotNull(content);
+        assertFalse(content.isEmpty());
+        assertEquals(6, content.get("268447644:1348828088686947792").size());
     }
 
     @Test
