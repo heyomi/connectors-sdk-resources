@@ -28,7 +28,7 @@ public interface AconexProperties extends Model {
 
     @Property(
             title = "Aconex Projects",
-            description = "List of Aconex Project IDs to crawl.",
+            description = "List of Aconex Projects to crawl.",
             order = 4,
             hints = { UIHints.ADVANCED }
     )
