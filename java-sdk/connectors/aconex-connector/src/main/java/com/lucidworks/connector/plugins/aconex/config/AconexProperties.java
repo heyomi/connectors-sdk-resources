@@ -14,7 +14,7 @@ public interface AconexProperties extends Model {
     @StringSchema(minLength = 1)
     String host();
 
-    @Property(title = "API Key", required = true, description = "The Aconex API Application Key.", order = 2)
+    @Property(title = "API Key", required = true, description = "The Aconex API Application Key.", order = 2, hints = { UIHints.SECRET })
     @StringSchema(minLength = 1)
     String apiKey();
 
