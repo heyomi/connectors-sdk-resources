@@ -46,9 +46,17 @@ public interface AconexProperties extends Model {
 
     @Property(
             title = "Limits",
-            description = "Options for including or excluding items based on size, in bytes.",
+            description = "Options for including or excluding documents.",
             order = 6,
             hints = { UIHints.ADVANCED }
     )
     LimitProperties limit();
+
+    @Property(
+            title = "Performance",
+            description = "These API request limits when calling the Aconex web services.",
+            order = 7,
+            hints = { UIHints.ADVANCED }
+    )
+    PerformanceProperties performance();
 }
