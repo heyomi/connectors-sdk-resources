@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -48,11 +49,10 @@ class AconexServiceTest {
         when(config.properties().host()).thenReturn("https://uk1.aconex.co.uk");
         when(config.properties().apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
         when(config.properties().item()).thenReturn(itemLimitProperties);
-        service = new AconexService(config);
     }
 
     @Test
-    void getContent() {
+    void shouldReturnDocumentContent() {
         // when(properties.projects()).thenReturn(Arrays.asList("1879048199", "1879048279"));
         when(authProps.username()).thenReturn("Omar McKenzie");
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
@@ -62,6 +62,19 @@ class AconexServiceTest {
 
         assertNotNull(content);
         assertTrue(content.size() > 0);
+    }
+
+    @Test
+    void shouldReturnEmptyResponseWhenProjectIsInvalid() {
+        when(properties.projects()).thenReturn(Arrays.asList("FAKE", "PROJECT"));
+        when(authProps.username()).thenReturn("Omar McKenzie");
+        when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
+
+        service = new AconexService(config);
+        Map<String, Map<String, Object>> content = service.getDocuments();
+
+        assertNotNull(content);
+        assertTrue(content.isEmpty());
     }
 
     // @Test
@@ -105,7 +118,7 @@ class AconexServiceTest {
     }
 
     @Test
-    void getContent_error403() {
+    void shouldReturnEmptyResponseWhenCredentialsAreInvalid() {
         when(properties.projects()).thenReturn(Collections.singletonList("1879048407"));
         when(authProps.username()).thenReturn("poleary");
         when(authProps.password()).thenReturn("Auth3nt1c");

@@ -45,12 +45,7 @@ public class AconexService implements AconexClient {
         this.client = setClient(config);
         this.apiEndpoint = client.getApiEndpoint();
         this.projectListCache = getProjectsCache(apiEndpoint);
-
-        if (config.properties().projects() != null || !config.properties().projects().isEmpty()) {
-            this.stats.setProjectIds(config.properties().projects());
-        } else {
-            this.stats.setProjectIds(getProjectIds());
-        }
+        this.stats.setProjectIds(getProjectIds());
     }
 
     @Override
@@ -120,7 +115,6 @@ public class AconexService implements AconexClient {
     public List<String> getProjectIds() {
         return getProjects().stream().map(Project::getProjectID).collect(Collectors.toList());
     }
-
 
     public Map<String, Map<String, Object>> getPagedDoc() {
         int pageNumber = 1;
@@ -237,12 +231,25 @@ public class AconexService implements AconexClient {
     }
 
     private List<Project> getProjects() {
+        List<Project> projects = new ArrayList<>();
         try {
-            ProjectList projectList = projectListCache.get(apiEndpoint);
-            return projectList.getSearchResults();
-        } catch (ExecutionException e) {
-            throw new InternalError("Could not load project instance " + apiEndpoint, e.getCause());
+            ProjectList projectList = null;
+            projectList = projectListCache.get(apiEndpoint);
+            List<String> projectNames = config.properties().projects();
+
+            if (projectList == null) {
+                logger.warn("Project List is empty.");
+            } else {
+                projects = projectList.getSearchResults();
+
+                if (projects != null && !projectNames.isEmpty())
+                    projects.removeIf(p -> !projectNames.contains(p.getProjectName()));
+            }
+        } catch (CacheLoader.InvalidCacheLoadException | ExecutionException e) {
+            logger.error("Could not load project instance " + apiEndpoint, e.getCause());
         }
+
+        return projects;
     }
 
     private AconexHttpClient setClient(AconexConfig config) {

@@ -32,7 +32,8 @@ public interface AconexProperties extends Model {
             order = 4,
             hints = { UIHints.ADVANCED }
     )
-    @ArraySchema(minItems = 1)
+    @ArraySchema(defaultValue = "[]")
+    @StringSchema(minLength = 1)
     List<String> projects();
 
     @Property(
