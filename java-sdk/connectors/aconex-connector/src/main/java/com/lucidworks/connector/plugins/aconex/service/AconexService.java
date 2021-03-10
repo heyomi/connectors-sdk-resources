@@ -121,7 +121,7 @@ public class AconexService implements AconexClient {
         Map<String, Map<String, Object>> content = new HashMap<>();
         List<String> ids = getProjectIds();
         for (String id : ids) {
-            int pageSize = config.properties().item().pageSize();
+            int pageSize = config.properties().limit().pageSize();
             content = getDocumentsByProject(id, pageNumber, pageSize);
             SearchResultsStats results = getSearchResultsStats();
             logger.info(results.toString());
@@ -142,7 +142,7 @@ public class AconexService implements AconexClient {
         try {
             Parser parser = new AutoDetectParser();
             // No limit; Your document contained more than 100000 characters, and so your requested limit has been reached. To receive the full text of the document.
-            BodyContentHandler handler = new BodyContentHandler(-1);
+            BodyContentHandler handler = new BodyContentHandler(config.properties().limit().write());
             Metadata metadata = new Metadata();
             ParseContext parseContext = new ParseContext();
             InputStream targetStream = new ByteArrayInputStream(body);
@@ -153,10 +153,12 @@ public class AconexService implements AconexClient {
             //getting the content of the document
             content.put("body", handler.toString());
 
-            //getting metadata of the document
-            String[] metadataNames = metadata.names();
-            for (String name : metadataNames) {
-                content.put(name.replace(":", "_"), metadata.get(name));
+            if(config.properties().limit().includeMetadata()) {
+                //getting metadata of the document
+                String[] metadataNames = metadata.names();
+                for (String name : metadataNames) {
+                    content.put(name.replace(":", "_"), metadata.get(name));
+                }
             }
         } catch (IOException | SAXException | TikaException e) {
             logger.error(e.getMessage());
@@ -168,10 +170,10 @@ public class AconexService implements AconexClient {
     private List<Document> getDocumentsFromXML(String xml) {
         List<Document> documents = new ArrayList<>();
         try {
-            Set<String> includedFileExtensions = config.properties().item().includedFileExtensions();
-            Set<String> excludedFileExtensions = config.properties().item().excludedFileExtensions();
-            int maxFileSize = config.properties().item().maxSizeBytes();
-            int minFileSize = config.properties().item().minSizeBytes();
+            Set<String> includedFileExtensions = config.properties().limit().includedFileExtensions();
+            Set<String> excludedFileExtensions = config.properties().limit().excludedFileExtensions();
+            int maxFileSize = config.properties().limit().maxSizeBytes();
+            int minFileSize = config.properties().limit().minSizeBytes();
 
             XmlMapper xmlMapper = new XmlMapper();
             RegisterSearch registerSearch = xmlMapper.readValue(xml, RegisterSearch.class);

@@ -2,7 +2,7 @@ package com.lucidworks.connector.plugins.aconex.service;
 
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.config.AuthenticationConfig;
-import com.lucidworks.connector.plugins.aconex.config.ItemLimitProperties;
+import com.lucidworks.connector.plugins.aconex.config.LimitProperties;
 import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class AconexServiceTest {
     AuthenticationConfig.BasicAuthenticationProperties authProps;
 
     @Mock
-    ItemLimitProperties itemLimitProperties;
+    LimitProperties limitProperties;
 
     @Mock
     TimeoutProperties timeoutProps;
@@ -42,13 +42,13 @@ class AconexServiceTest {
         MockitoAnnotations.initMocks(this);
         when(properties.auth()).thenReturn(authConfig);
         when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
-        when(itemLimitProperties.pageSize()).thenReturn(25);
+        when(limitProperties.pageSize()).thenReturn(25);
         when(properties.auth().basic()).thenReturn(authProps);
         when(properties.timeout()).thenReturn(timeoutProps);
         when(config.properties()).thenReturn(properties);
         when(config.properties().host()).thenReturn("https://uk1.aconex.co.uk");
         when(config.properties().apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
-        when(config.properties().item()).thenReturn(itemLimitProperties);
+        when(config.properties().limit()).thenReturn(limitProperties);
     }
 
     @Test
@@ -93,7 +93,7 @@ class AconexServiceTest {
     void shouldReturnDocumentsWhenMaxFileSize() {
         when(authProps.username()).thenReturn("Omar McKenzie");
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
-        when(itemLimitProperties.maxSizeBytes()).thenReturn(300000);
+        when(limitProperties.maxSizeBytes()).thenReturn(300000);
 
         service = new AconexService(config);
         Map<String, Map<String, Object>> content = service.getDocuments();
@@ -107,7 +107,7 @@ class AconexServiceTest {
     void shouldReturnDocumentsWhenMinFileSize() {
         when(authProps.username()).thenReturn("Omar McKenzie");
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
-        when(itemLimitProperties.maxSizeBytes()).thenReturn(800000);
+        when(limitProperties.maxSizeBytes()).thenReturn(800000);
 
         service = new AconexService(config);
         Map<String, Map<String, Object>> content = service.getDocuments();

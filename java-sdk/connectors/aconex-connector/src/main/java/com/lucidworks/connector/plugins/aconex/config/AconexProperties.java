@@ -47,8 +47,8 @@ public interface AconexProperties extends Model {
     @Property(
             title = "Limits",
             description = "Options for including or excluding items based on size, in bytes.",
-            order = 7,
+            order = 6,
             hints = { UIHints.ADVANCED }
     )
-    ItemLimitProperties item();
+    LimitProperties limit();
 }

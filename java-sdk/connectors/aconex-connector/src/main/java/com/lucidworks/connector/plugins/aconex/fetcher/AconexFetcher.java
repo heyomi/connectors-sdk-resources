@@ -85,7 +85,7 @@ public class AconexFetcher implements ContentFetcher {
 
         for (String id : client.getProjectIds()) {
             handleProject(context, id);
-            int pageSize = config.properties().item().pageSize();
+            int pageSize = config.properties().limit().pageSize();
             Map<String, Map<String, Object>> content = client.getDocumentsByProject(id, pageNumber, pageSize);
             SearchResultsStats stats = client.getSearchResultsStats();
             createNewDocuments(context, content);
@@ -132,7 +132,7 @@ public class AconexFetcher implements ContentFetcher {
                 .metadata(m -> {
                     // m.setInteger(TOTAL_INDEXED, totalIndexed);
                     m.setInteger(PAGE_NUMBER, pageNumber);
-                    m.setInteger(PAGE_SIZE, config.properties().item().pageSize());
+                    m.setInteger(PAGE_SIZE, config.properties().limit().pageSize());
                     m.setInteger(TOTAL_RESULTS, totalResults);
                     m.setInteger(TOTAL_PAGES, totalPages);
                     m.setInteger(TOTAL_ON_PAGE, totalOnPage);
