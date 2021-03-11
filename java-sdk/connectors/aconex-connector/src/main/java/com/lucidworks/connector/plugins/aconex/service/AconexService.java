@@ -37,14 +37,14 @@ public class AconexService implements AconexClient {
     private final AconexHttpClient client;
     private final AconexConfig config;
     private final LoadingCache<String, ProjectList> projectListCache;
-    private final String apiEndpoint;
+    private final String hostname;
     private SearchResultsStats stats = new SearchResultsStats();
 
     public AconexService(AconexConfig config) {
         this.config = config;
         this.client = setClient(config);
-        this.apiEndpoint = client.getApiEndpoint();
-        this.projectListCache = getProjectsCache(apiEndpoint);
+        this.hostname = config.properties().host();
+        this.projectListCache = getProjectsCache(hostname);
         this.stats.setProjectIds(getProjectIds());
     }
 
@@ -236,7 +236,7 @@ public class AconexService implements AconexClient {
         List<Project> projects = new ArrayList<>();
         try {
             ProjectList projectList = null;
-            projectList = projectListCache.get(apiEndpoint);
+            projectList = projectListCache.get(hostname);
             List<String> projectNames = config.properties().projects();
 
             if (projectList == null) {
@@ -248,7 +248,7 @@ public class AconexService implements AconexClient {
                     projects.removeIf(p -> !projectNames.contains(p.getProjectName()));
             }
         } catch (CacheLoader.InvalidCacheLoadException | ExecutionException e) {
-            logger.error("Could not load project instance " + apiEndpoint, e.getCause());
+            logger.error("Could not load project instance " + hostname, e.getCause());
         }
 
         return projects;

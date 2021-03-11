@@ -10,19 +10,20 @@ import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
 public class RestApiUriBuilder {
 
-    public static URI buildProjectsUri(@NonNull String apiRootPath) {
-        return UriBuilder.fromPath(apiRootPath).path(Constants.PROJECTS).build();
+    public static URI buildProjectsUri(@NonNull String hostname) {
+        return UriBuilder.fromPath(hostname).path(API).path(Constants.PROJECTS).build();
     }
 
-    public static URI buildDocumentsUri(@NonNull String apiRootPath, @NonNull String projectId) {
-        return buildDocumentsUri(apiRootPath, projectId, DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
+    public static URI buildDocumentsUri(@NonNull String hostname, @NonNull String projectId) {
+        return buildDocumentsUri(hostname, projectId, DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
     }
 
-    public static URI buildDocumentsUri(@NonNull String apiRootPath, @NonNull String projectId, int pageNumber, int pageSize) {
+    public static URI buildDocumentsUri(@NonNull String hostname, @NonNull String projectId, int pageNumber, int pageSize) {
         if (pageSize == 0 || pageNumber == 0)
-            return buildDocumentsUri(apiRootPath, projectId);
+            return buildDocumentsUri(hostname, projectId);
 
-        UriBuilder uriBuilder = UriBuilder.fromPath(apiRootPath)
+        UriBuilder uriBuilder = UriBuilder.fromPath(hostname)
+                .path(API)
                 .path(Constants.PROJECTS)
                 .path(projectId)
                 .path(Constants.REGISTER);
@@ -35,8 +36,9 @@ public class RestApiUriBuilder {
         return uriBuilder.build();
     }
 
-    public static URI buildDownloadDocumentsUri(@NonNull String apiRootPath, String projectId, String documentId) {
-        return UriBuilder.fromPath(apiRootPath)
+    public static URI buildDownloadDocumentsUri(@NonNull String hostname, String projectId, String documentId) {
+        return UriBuilder.fromPath(hostname)
+                .path(API)
                 .path(Constants.PROJECTS)
                 .path(projectId)
                 .path(Constants.REGISTER)

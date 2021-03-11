@@ -26,13 +26,11 @@ public class AconexHttpClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexHttpClient.class);
     private final AconexHttpClientOptions options;
     private final HttpClient httpClient;
-    private final String apiEndpoint;
     private String basicAuth;
 
     public AconexHttpClient(AconexHttpClientOptions options) {
         this.options = options;
         this.httpClient = createHttpClient(options);
-        this.apiEndpoint = options.getHostname() + "/api";
     }
 
     private HttpClient createHttpClient(AconexHttpClientOptions options) {
@@ -87,7 +85,7 @@ public class AconexHttpClient {
         if (pageNumber < 1) pageNumber = DEFAULT_PAGE_NUMBER;
 
         try {
-            final URI uri = RestApiUriBuilder.buildDocumentsUri(apiEndpoint, projectId, pageNumber, pageSize);
+            final URI uri = RestApiUriBuilder.buildDocumentsUri(options.getHostname(), projectId, pageNumber, pageSize);
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(uri)
@@ -116,7 +114,7 @@ public class AconexHttpClient {
         logger.debug("Getting doc:{}", documentId);
         byte[] content = null;
         try {
-            final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(apiEndpoint, projectId, documentId);
+            final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(options.getHostname(), projectId, documentId);
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(uri)
@@ -165,10 +163,6 @@ public class AconexHttpClient {
 
     public void setBasicAuth(String basicAuth) {
         this.basicAuth = basicAuth;
-    }
-
-    public String getApiEndpoint() {
-        return apiEndpoint;
     }
 
 }

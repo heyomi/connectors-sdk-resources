@@ -9,7 +9,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 class RestApiUriBuilderTest {
-    private final String apiRoot = "https://apidev.aconex.com/api";
+    private final String apiRoot = "https://apidev.aconex.com";
 
     @Test
     void buildProjectsUri() {

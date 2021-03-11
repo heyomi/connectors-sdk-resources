@@ -15,7 +15,6 @@ class AconexHttpClientTest {
     @Mock
     AconexHttpClientOptions options;
 
-    private final String apiEndpoint = "https://uk1.aconex.co.uk/api";
     private final String projectId = "268447644";
     private final String documentId = "1348828088686947792";
 
@@ -33,7 +32,7 @@ class AconexHttpClientTest {
 
     @Test
     void shouldReturnProjectList() {
-        ProjectList projects = client.getProjectList(apiEndpoint);
+        ProjectList projects = client.getProjectList(options.getHostname());
 
         assertNotNull(projects);
         assertNotNull(projects.getSearchResults());
@@ -55,17 +54,12 @@ class AconexHttpClientTest {
     }
 
     @Test
-    void shouldReturnAPI() {
-        assertEquals(apiEndpoint, client.getApiEndpoint());
-    }
-
-    @Test
     void shouldReturn401Exception_whenCredentialsAreInvalid() {
         when(options.getUsername()).thenReturn("fakeuser");
         when(options.getPassword()).thenReturn("fakepassword");
         client = new AconexHttpClient(options);
         // assertThrows(NotAuthorizedException.class, () -> client.getProjectList(apiEndpoint));
 
-        assertNull(client.getProjectList(apiEndpoint));
+        assertNull(client.getProjectList(options.getHostname()));
     }
 }

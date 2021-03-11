@@ -1,6 +1,7 @@
 package com.lucidworks.connector.plugins.aconex.model;
 
 public class Constants {
+    public static final String API = "api";
     public static final String PROJECTS = "projects";
     public static final String REGISTER = "register";
     public static final String MARKEDUP = "markedup";
