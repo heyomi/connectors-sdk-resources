@@ -1,5 +1,6 @@
 package com.lucidworks.connector.plugins.aconex.service.rest;
 
+import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;

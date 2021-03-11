@@ -5,8 +5,10 @@ import com.lucidworks.connector.plugins.aconex.client.AconexClient;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.fetcher.AconexFetcher;
 import com.lucidworks.connector.plugins.aconex.provider.AconexProvider;
+import com.lucidworks.connector.plugins.aconex.provider.HttpClientProvider;
 import com.lucidworks.fusion.connector.plugin.api.plugin.ConnectorPlugin;
 import com.lucidworks.fusion.connector.plugin.api.plugin.ConnectorPluginProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ public class AconexPlugin implements ConnectorPluginProvider {
             @Override
             protected void configure() {
                 bind(AconexClient.class).toProvider(AconexProvider.class).in(Singleton.class);
+                bind(CloseableHttpClient.class).toProvider(HttpClientProvider.class).in(Singleton.class);
             }
         };
 

@@ -6,7 +6,7 @@ import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import com.lucidworks.connector.plugins.aconex.model.SearchResults;
-import com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

@@ -2,7 +2,7 @@ package com.lucidworks.connector.plugins.aconex.client.http;
 
 import com.google.gson.Gson;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
-import com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

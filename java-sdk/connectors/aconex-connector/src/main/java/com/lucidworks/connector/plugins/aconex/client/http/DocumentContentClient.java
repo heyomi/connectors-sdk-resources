@@ -1,7 +1,7 @@
 package com.lucidworks.connector.plugins.aconex.client.http;
 
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
-import com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

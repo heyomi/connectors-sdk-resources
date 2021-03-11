@@ -1,4 +1,4 @@
-package com.lucidworks.connector.plugins.aconex.service.rest;
+package com.lucidworks.connector.plugins.aconex.client.rest;
 
 import com.lucidworks.connector.plugins.aconex.model.Constants;
 import lombok.NonNull;

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
-import static com.lucidworks.connector.plugins.aconex.service.rest.RestApiUriBuilder.buildDocumentViewerUri;
+import static com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder.buildDocumentViewerUri;
 
 public class AconexService implements AconexClient {
     private static final Logger logger = LoggerFactory.getLogger(AconexService.class);
