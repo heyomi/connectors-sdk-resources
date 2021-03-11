@@ -1,12 +1,9 @@
 package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
-import com.lucidworks.fusion.schema.SchemaAnnotations.ArraySchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 import com.lucidworks.fusion.schema.UIHints;
-
-import java.util.List;
 
 public interface AconexProperties extends Model {
 
@@ -27,14 +24,12 @@ public interface AconexProperties extends Model {
     AuthenticationConfig auth();
 
     @Property(
-            title = "Aconex Projects",
-            description = "List of Aconex Projects to crawl.",
+            title = "Aconex Projects Options",
+            description = "Options for configuring project retrieval.",
             order = 4,
             hints = { UIHints.ADVANCED }
     )
-    @ArraySchema(defaultValue = "[]")
-    @StringSchema(minLength = 1)
-    List<String> projects();
+    ProjectProperties project();
 
     @Property(
             title = "HTTP Timeout Options",

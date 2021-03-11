@@ -4,7 +4,7 @@ import com.lucidworks.fusion.schema.Model;
 import com.lucidworks.fusion.schema.SchemaAnnotations.NumberSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 
-public interface PerformanceProperties  extends Model {
+public interface PerformanceProperties extends Model {
     @Property(
             title = "Max Frequency Throttle",
             description = "Aconex Web Services has implemented a limit of maximum 5 requests per second." +

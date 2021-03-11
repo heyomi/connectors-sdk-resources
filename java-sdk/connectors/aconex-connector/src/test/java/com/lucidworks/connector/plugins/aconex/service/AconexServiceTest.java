@@ -1,9 +1,6 @@
 package com.lucidworks.connector.plugins.aconex.service;
 
-import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
-import com.lucidworks.connector.plugins.aconex.config.AuthenticationConfig;
-import com.lucidworks.connector.plugins.aconex.config.LimitProperties;
-import com.lucidworks.connector.plugins.aconex.config.TimeoutProperties;
+import com.lucidworks.connector.plugins.aconex.config.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -29,6 +26,9 @@ class AconexServiceTest {
     TimeoutProperties timeoutProps;
 
     @Mock
+    ProjectProperties projectProperties;
+
+    @Mock
     AconexConfig.Properties properties;
 
     @Mock
@@ -43,6 +43,7 @@ class AconexServiceTest {
         when(properties.auth()).thenReturn(authConfig);
         when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
         when(limitProperties.pageSize()).thenReturn(25);
+        when(limitProperties.pageSize()).thenReturn(25);
         when(limitProperties.write()).thenReturn(-1);
         when(limitProperties.includeMetadata()).thenReturn(true);
         when(properties.auth().basic()).thenReturn(authProps);
@@ -51,6 +52,7 @@ class AconexServiceTest {
         when(config.properties().host()).thenReturn("https://uk1.aconex.co.uk");
         when(config.properties().apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
         when(config.properties().limit()).thenReturn(limitProperties);
+        when(config.properties().project()).thenReturn(projectProperties);
     }
 
     @Test
@@ -68,7 +70,7 @@ class AconexServiceTest {
 
     @Test
     void shouldReturnEmptyResponseWhenProjectIsInvalid() {
-        when(properties.projects()).thenReturn(Arrays.asList("FAKE", "PROJECT"));
+        when(projectProperties.projects()).thenReturn(Arrays.asList("FAKE", "PROJECT"));
         when(authProps.username()).thenReturn("Omar McKenzie");
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
 
@@ -133,7 +135,7 @@ class AconexServiceTest {
 
     @Test
     void shouldReturnEmptyResponseWhenCredentialsAreInvalid() {
-        when(properties.projects()).thenReturn(Collections.singletonList("1879048407"));
+        when(projectProperties.projects()).thenReturn(Collections.singletonList("1879048407"));
         when(authProps.username()).thenReturn("poleary");
         when(authProps.password()).thenReturn("Auth3nt1c");
 

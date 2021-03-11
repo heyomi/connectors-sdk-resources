@@ -56,7 +56,7 @@ public class AconexService implements AconexClient {
     @Override
     public Map<String, Map<String, Object>> getDocuments(int pageNumber, int pageSize) {
         Map<String, Map<String, Object>> content = new HashMap<>();
-        List<String> projectIds = config.properties().projects();
+        List<String> projectIds = config.properties().project().projects();
 
         if (projectIds.isEmpty()) {
             logger.info("No project selected in configuration. All projects will be crawled.");
@@ -237,7 +237,7 @@ public class AconexService implements AconexClient {
         try {
             ProjectList projectList = null;
             projectList = projectListCache.get(hostname);
-            List<String> projectNames = config.properties().projects();
+            List<String> projectNames = config.properties().project().projects();
 
             if (projectList == null) {
                 logger.warn("Project List is empty.");
