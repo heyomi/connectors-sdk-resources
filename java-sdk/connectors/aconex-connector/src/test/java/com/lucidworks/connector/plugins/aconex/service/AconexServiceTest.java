@@ -41,7 +41,7 @@ class AconexServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         when(properties.auth()).thenReturn(authConfig);
-        when(timeoutProps.connectTimeoutMs()).thenReturn(30000);
+        when(timeoutProps.connection()).thenReturn(30000);
         when(limitProperties.pageSize()).thenReturn(25);
         when(limitProperties.pageSize()).thenReturn(25);
         when(limitProperties.write()).thenReturn(-1);

@@ -1,4 +1,4 @@
-package com.lucidworks.connector.plugins.aconex.service.http;
+package com.lucidworks.connector.plugins.aconex.client.http;
 
 import com.google.gson.Gson;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
@@ -7,8 +7,7 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotAuthorizedException;
+import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -28,6 +27,7 @@ public class AconexHttpClient {
     private final HttpClient httpClient;
     private String basicAuth;
 
+    @Inject
     public AconexHttpClient(AconexHttpClientOptions options) {
         this.options = options;
         this.httpClient = createHttpClient(options);
@@ -137,20 +137,6 @@ public class AconexHttpClient {
         }
 
         return content;
-    }
-
-    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException {
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 401) {
-            throw new NotAuthorizedException(response.body());
-        }
-
-        if (response.statusCode() == 403) {
-            throw new ForbiddenException(response.body());
-        }
-
-        return response;
     }
 
     private static String basicAuth(String username, String password) {

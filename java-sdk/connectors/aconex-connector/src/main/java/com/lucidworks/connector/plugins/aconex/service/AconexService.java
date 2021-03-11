@@ -6,23 +6,13 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.lucidworks.connector.plugins.aconex.client.AconexClient;
+import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClient;
+import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClientOptions;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.*;
-import com.lucidworks.connector.plugins.aconex.service.http.AconexHttpClient;
-import com.lucidworks.connector.plugins.aconex.service.http.AconexHttpClientOptions;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -139,7 +129,7 @@ public class AconexService implements AconexClient {
 
     private Map<String, Object> parseDocument(byte[] body) {
         Map<String, Object> content = new HashMap<>();
-        try {
+        /*try {
             Parser parser = new AutoDetectParser();
             // No limit; Your document contained more than 100000 characters, and so your requested limit has been reached. To receive the full text of the document.
             BodyContentHandler handler = new BodyContentHandler(config.properties().limit().write());
@@ -162,7 +152,7 @@ public class AconexService implements AconexClient {
             }
         } catch (IOException | SAXException | TikaException e) {
             logger.error(e.getMessage());
-        }
+        }*/
 
         return content;
     }
@@ -261,7 +251,7 @@ public class AconexService implements AconexClient {
                 AconexHttpClientOptions.AuthType.BASIC,
                 config.properties().auth().basic().username(),
                 config.properties().auth().basic().password(),
-                config.properties().timeout().connectTimeoutMs()
+                config.properties().timeout().connection()
         ));
     }
 

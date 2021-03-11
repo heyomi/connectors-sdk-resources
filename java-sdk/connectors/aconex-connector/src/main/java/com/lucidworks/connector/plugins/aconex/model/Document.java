@@ -13,14 +13,17 @@ import lombok.NoArgsConstructor;
 public class Document {
     @JacksonXmlProperty(localName = "DocumentId")
     private String id;
+    @JacksonXmlProperty(localName = "Confidental")
     private boolean confidential;
+    @JacksonXmlProperty(localName = "DocumentStatus")
     private String documentStatus;
+    @JacksonXmlProperty(localName = "DocumentType")
     private String documentType;
     @JacksonXmlProperty(localName = "FileSize")
     private int fileSize;
     @JacksonXmlProperty(localName = "FileType")
     private String fileType;
-    @JacksonXmlProperty(localName = "FileName")
+    @JacksonXmlProperty(localName = "Filename")
     private String filename;
     @JacksonXmlProperty(localName = "Title")
     private String title;

@@ -10,6 +10,8 @@ import com.lucidworks.fusion.connector.plugin.api.plugin.ConnectorPluginProvider
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Singleton;
+
 public class AconexPlugin implements ConnectorPluginProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(AconexPlugin.class);
@@ -21,7 +23,7 @@ public class AconexPlugin implements ConnectorPluginProvider {
         AbstractModule nonGenModule = new AbstractModule() {
             @Override
             protected void configure() {
-                bind(AconexClient.class).toProvider(AconexProvider.class);
+                bind(AconexClient.class).toProvider(AconexProvider.class).in(Singleton.class);
             }
         };
 

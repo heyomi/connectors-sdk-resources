@@ -2,11 +2,13 @@ package com.lucidworks.connector.plugins.aconex.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@NoArgsConstructor
 public class ProjectList {
-    private final List<Project> searchResults;
+    private List<Project> searchResults;
 
     @JsonCreator
     public ProjectList(@JsonProperty("searchResults") List<Project> searchResults) {

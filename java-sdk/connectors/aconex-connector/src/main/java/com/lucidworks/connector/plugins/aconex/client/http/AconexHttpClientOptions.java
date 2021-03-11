@@ -1,4 +1,4 @@
-package com.lucidworks.connector.plugins.aconex.service.http;
+package com.lucidworks.connector.plugins.aconex.client.http;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

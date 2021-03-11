@@ -1,5 +1,7 @@
 package com.lucidworks.connector.plugins.aconex.service.http;
 
+import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClient;
+import com.lucidworks.connector.plugins.aconex.client.http.AconexHttpClientOptions;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
