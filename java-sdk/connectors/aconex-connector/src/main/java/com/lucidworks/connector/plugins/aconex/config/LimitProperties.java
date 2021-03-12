@@ -27,14 +27,14 @@ public interface LimitProperties extends Model {
     Integer maxItems();
 
     @Property(
-            title = "Minimum File Size",
+            title = "Minimum File Size (bytes)",
             description = "Used for excluding items when the item size is smaller than the configured value. The default (-1) means no limit.",
             order = 2)
     @NumberSchema(defaultValue = 1)
     Integer minSizeBytes();
 
     @Property(
-            title = "Maximum File Size",
+            title = "Maximum File Size (bytes)",
             description = "Used for excluding items when the item size is larger than the configured value. The default (-1) means no limit.",
             order = 3)
     @NumberSchema(defaultValue = -1)
@@ -42,9 +42,10 @@ public interface LimitProperties extends Model {
 
     @Property(
             title = "Request Page Size",
-            description = "Total number of docs to generate from the second and subsequent crawls.",
+            description = "If specified, the value must be a number that is divisible by 25." +
+                    "Without this parameter specified, this defaults to 25 Note: this parameter has a maximum value of 500",
             order = 4)
-    @NumberSchema(defaultValue = DEFAULT_PAGE_SIZE)
+    @NumberSchema(defaultValue = DEFAULT_PAGE_SIZE, minimum = DEFAULT_PAGE_SIZE, maximum = 500)
     int pageSize();
 
     @Property(

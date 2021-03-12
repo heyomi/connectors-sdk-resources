@@ -27,6 +27,6 @@ public interface ProjectProperties extends Model {
             order = 2,
             hints = { UIHints.ADVANCED }
     )
-    @SchemaAnnotations.StringSchema(minLength = 1)
+    @SchemaAnnotations.StringSchema(minLength = 1, defaultValue = RETURN_FIELDS)
     String documentReturnFields();
 }
