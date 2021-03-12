@@ -1,6 +1,5 @@
 package com.lucidworks.connector.plugins.aconex.client.rest;
 
-import com.lucidworks.connector.plugins.aconex.model.Constants;
 import lombok.NonNull;
 
 import javax.ws.rs.core.UriBuilder;
@@ -11,7 +10,7 @@ import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 public class RestApiUriBuilder {
 
     public static URI buildProjectsUri(@NonNull String hostname) {
-        return UriBuilder.fromPath(hostname).path(API).path(Constants.PROJECTS).build();
+        return UriBuilder.fromPath(hostname).path(API).path(PROJECTS).build();
     }
 
     public static URI buildDocumentsUri(@NonNull String hostname, @NonNull String projectId) {
@@ -24,34 +23,37 @@ public class RestApiUriBuilder {
 
         UriBuilder uriBuilder = UriBuilder.fromPath(hostname)
                 .path(API)
-                .path(Constants.PROJECTS)
+                .path(PROJECTS)
                 .path(projectId)
-                .path(Constants.REGISTER);
+                .path(REGISTER);
 
-        uriBuilder.queryParam(Constants.PARAM_SEARCH_TYPE, Constants.SEARCH_TYPE_PAGED)
-                .queryParam(Constants.PARAM_PAGE_SIZE, pageSize)
-                .queryParam(Constants.PARAM_PAGE_NUMBER, pageNumber)
-                .queryParam(Constants.PARAM_RETURN_FIELDS, Constants.RETURN_FIELDS);
+        uriBuilder.queryParam(PARAM_SEARCH_TYPE, SEARCH_TYPE_PAGED)
+                .queryParam(PARAM_PAGE_SIZE, pageSize)
+                .queryParam(PARAM_PAGE_NUMBER, pageNumber)
+                .queryParam(PARAM_RETURN_FIELDS, DEFAULT_RETURN_FIELDS);
 
         return uriBuilder.build();
     }
 
     public static URI buildDocumentsUri(@NonNull String hostname, @NonNull String projectId, int pageNumber, int pageSize, String returnFields) {
-        if (pageSize <= 0 || pageNumber <= 0 || returnFields == null)
+        if (pageSize <= 0 || pageNumber <= 0)
             return buildDocumentsUri(hostname, projectId);
+
+        if (returnFields == null) returnFields = RETURN_FIELDS;
 
         if (pageSize % DEFAULT_PAGE_SIZE_DIVISOR != 0) pageSize = 25;
 
         UriBuilder uriBuilder = UriBuilder.fromPath(hostname)
                 .path(API)
-                .path(Constants.PROJECTS)
+                .path(PROJECTS)
                 .path(projectId)
-                .path(Constants.REGISTER);
+                .path(REGISTER);
 
-        uriBuilder.queryParam(Constants.PARAM_SEARCH_TYPE, Constants.SEARCH_TYPE_PAGED)
-                .queryParam(Constants.PARAM_PAGE_SIZE, pageSize)
-                .queryParam(Constants.PARAM_PAGE_NUMBER, pageNumber)
-                .queryParam(Constants.PARAM_RETURN_FIELDS, returnFields);
+        uriBuilder.queryParam(PARAM_SEARCH_TYPE, SEARCH_TYPE_PAGED)
+                .queryParam(PARAM_PAGE_SIZE, pageSize)
+                .queryParam(PARAM_PAGE_NUMBER, pageNumber)
+                .queryParam(PARAM_RETURN_FIELDS, returnFields)
+                .queryParam(PARAM_SORT_FIELD, DEFAULT_SORT_FIELD); // default direction ASC; process smaller files
 
         return uriBuilder.build();
     }
@@ -59,11 +61,11 @@ public class RestApiUriBuilder {
     public static URI buildDownloadDocumentsUri(@NonNull String hostname, String projectId, String documentId) {
         return UriBuilder.fromPath(hostname)
                 .path(API)
-                .path(Constants.PROJECTS)
+                .path(PROJECTS)
                 .path(projectId)
-                .path(Constants.REGISTER)
+                .path(REGISTER)
                 .path(documentId)
-                .path(Constants.MARKEDUP)
+                .path(MARKEDUP)
                 .build();
     }
 

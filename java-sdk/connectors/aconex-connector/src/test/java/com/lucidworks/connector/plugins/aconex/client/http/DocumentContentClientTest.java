@@ -61,7 +61,7 @@ class DocumentContentClientTest {
         when(properties.auth()).thenReturn(authConfig);
         when(properties.timeout()).thenReturn(timeoutProps);
         when(properties.limit()).thenReturn(limitProperties);
-        when(projectProperties.documentReturnFields()).thenReturn(Constants.RETURN_FIELDS);
+        when(projectProperties.documentReturnFields()).thenReturn(Constants.DEFAULT_RETURN_FIELDS);
         when(properties.project()).thenReturn(projectProperties);
         when(properties.host()).thenReturn("https://uk1.aconex.co.uk");
         when(properties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
