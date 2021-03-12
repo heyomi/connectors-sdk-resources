@@ -1,17 +1,16 @@
 package com.lucidworks.connector.plugins.aconex.client.http;
 
 import com.google.gson.Gson;
+import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Project;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
-import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
@@ -20,9 +19,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 public class ProjectClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProjectClient.class);
     private final CloseableHttpClient httpClient;
     private final AconexConfig config;
 
@@ -45,10 +43,10 @@ public class ProjectClient {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     projectList = new Gson().fromJson(EntityUtils.toString(entity), ProjectList.class);
-                    logger.info("Total projects found: {}", projectList.getSearchResults().size());
+                    log.info("Total projects: {}", projectList.getSearchResults().size());
                 }
             } else {
-                logger.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
+                log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
             }
         }
 

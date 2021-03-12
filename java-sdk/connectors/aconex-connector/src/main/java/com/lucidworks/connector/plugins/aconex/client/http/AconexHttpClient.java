@@ -1,11 +1,10 @@
 package com.lucidworks.connector.plugins.aconex.client.http;
 
 import com.google.gson.Gson;
-import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import lombok.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
@@ -20,9 +19,8 @@ import java.util.Base64;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
+@Slf4j
 public class AconexHttpClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(AconexHttpClient.class);
     private final AconexHttpClientOptions options;
     private final HttpClient httpClient;
     private String basicAuth;
@@ -59,15 +57,15 @@ public class AconexHttpClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                logger.warn("An error occurred while getting project list. Aconex API response: {}", response.statusCode());
+                log.warn("An error occurred while getting project list. Aconex API response: {}", response.statusCode());
             } else {
                 projectList = new Gson().fromJson(response.body(), ProjectList.class);
-                logger.info("Total projects found: {}", projectList.getSearchResults().size());
+                log.info("Total projects found: {}", projectList.getSearchResults().size());
             }
         } catch (IOException e) {
-            logger.error("An error occurred while getting project list", e);
+            log.error("An error occurred while getting project list", e);
         } catch (InterruptedException e) {
-            logger.error("An error occurred while getting project list", e);
+            log.error("An error occurred while getting project list", e);
             Thread.currentThread().interrupt();
         }
 
@@ -79,7 +77,7 @@ public class AconexHttpClient {
     }
 
     public String getDocuments(@NonNull String projectId, int pageNumber, int pageSize) {
-        logger.info("Getting documents in project: {}/{}", projectId, pageNumber);
+        log.info("Getting documents in project: {}/{}", projectId, pageNumber);
 
         String documents = null;
         if (pageNumber < 1) pageNumber = DEFAULT_PAGE_NUMBER;
@@ -96,14 +94,14 @@ public class AconexHttpClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                logger.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response.statusCode());
+                log.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response.statusCode());
             } else {
                 documents = response.body();
             }
         } catch (IOException e) {
-            logger.error("An error occurred while getting documents", e);
+            log.error("An error occurred while getting documents", e);
         } catch (InterruptedException e) {
-            logger.error("An error occurred while project list", e);
+            log.error("An error occurred while project list", e);
             Thread.currentThread().interrupt();
         }
 
@@ -111,7 +109,7 @@ public class AconexHttpClient {
     }
 
     public byte[] getDocument(@NonNull String projectId, @NonNull String documentId) {
-        logger.debug("Getting doc:{}", documentId);
+        log.debug("Getting doc:{}", documentId);
         byte[] content = null;
         try {
             final URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(options.getHostname(), projectId, documentId);
@@ -125,14 +123,14 @@ public class AconexHttpClient {
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
             if (response.statusCode() != 200) {
-                logger.warn("An error occurred while accessing document:{} in project:{}. Aconex API response: {}", documentId, projectId, response.statusCode());
+                log.warn("An error occurred while accessing document:{} in project:{}. Aconex API response: {}", documentId, projectId, response.statusCode());
             } else {
                 content = response.body();
             }
         } catch (IOException e) {
-            logger.error("An error occurred while getting documents from project={}", projectId, e);
+            log.error("An error occurred while getting documents from project={}", projectId, e);
         } catch (InterruptedException e) {
-            logger.error("An error occurred while getting documents from project={}", projectId, e);
+            log.error("An error occurred while getting documents from project={}", projectId, e);
             Thread.currentThread().interrupt();
         }
 

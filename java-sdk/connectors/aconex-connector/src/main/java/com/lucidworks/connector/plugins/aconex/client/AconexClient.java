@@ -1,14 +1,16 @@
 package com.lucidworks.connector.plugins.aconex.client;
 
-import com.lucidworks.connector.plugins.aconex.model.SearchResultsStats;
+import com.lucidworks.connector.plugins.aconex.model.Document;
+import com.lucidworks.connector.plugins.aconex.model.Project;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public interface AconexClient {
-    List<String> getProjectIds();
-    Map<String, Map<String, Object>> getDocuments();
-    Map<String, Map<String, Object>> getDocuments(int pageNumber, int pageSize);
-    Map<String, Map<String, Object>> getDocumentsByProject(String projectId, int pageNumber, int pageSize);
-    SearchResultsStats getSearchResultsStats();
+
+    List<Project> getProjects() throws IOException;
+
+    List<Document> getDocuments(String projectId, int pageNumber) throws IOException;
+
+    int getTotalPages();
 }

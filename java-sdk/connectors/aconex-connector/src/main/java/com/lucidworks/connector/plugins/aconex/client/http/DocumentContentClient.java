@@ -1,21 +1,20 @@
 package com.lucidworks.connector.plugins.aconex.client.http;
 
-import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
+import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+@Slf4j
 public class DocumentContentClient {
-    private static final Logger logger = LoggerFactory.getLogger(DocumentContentClient.class);
     private final CloseableHttpClient httpClient;
     private final AconexConfig config;
 
@@ -26,7 +25,7 @@ public class DocumentContentClient {
     }
 
     public InputStream getDocumentContent(String projectId, String documentId) throws IOException {
-        logger.debug("Crawling doc:{}", documentId);
+        log.info("Crawling doc:{}", documentId);
 
         URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(config.properties().host(), projectId, documentId);
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
@@ -37,7 +36,7 @@ public class DocumentContentClient {
 
                 if (entity != null) return entity.getContent();
             } else {
-                logger.error("An error occurred while getting document:{}/{}. Aconex API response: {}", projectId, documentId, response != null ? response.getStatusLine() : null);
+                log.error("An error occurred while getting document:{}/{}. Aconex API response: {}", projectId, documentId, response != null ? response.getStatusLine() : null);
             }
         }
 

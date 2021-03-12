@@ -2,6 +2,7 @@ package com.lucidworks.connector.plugins.aconex.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,4 +52,10 @@ public class Document {
     private String select8;
     @JacksonXmlProperty(localName = "SelectListList9")
     private String select9;
+
+    private String url;
+
+    public void setUrl(String projectId) {
+        this.url = RestApiUriBuilder.buildDocumentViewerUri(projectId, id);
+    }
 }

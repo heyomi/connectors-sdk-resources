@@ -2,8 +2,9 @@ package com.lucidworks.connector.plugins.aconex.fetcher;
 
 import com.lucidworks.connector.plugins.aconex.client.AconexClient;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
-import com.lucidworks.connector.plugins.aconex.model.SearchResultsStats;
+import com.lucidworks.connector.plugins.aconex.processor.DocumentListProcessor;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.FetchResult;
+import com.lucidworks.fusion.connector.plugin.api.fetcher.result.PreFetchResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StartResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StopResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.type.content.ContentFetcher;
@@ -18,21 +19,17 @@ import java.util.Map;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
-// import com.lucidworks.connectors.components.processor.ProcessorRunner;
-
 public class AconexFetcher implements ContentFetcher {
 
     private static final Logger logger = LoggerFactory.getLogger(AconexFetcher.class);
     private static final String ERROR_MSG = "Item=%s failed with error=%s";
-
-    // private final ProcessorRunner processorRunner;
-    private final AconexClient client;
+    private final AconexClient service;
     private final AconexConfig config;
     private List<String> projects;
 
     @Inject
-    public AconexFetcher(AconexClient client, AconexConfig config) {
-        this.client = client;
+    public AconexFetcher(AconexClient service, AconexConfig config) {
+        this.service = service;
         this.config = config;
     }
 
@@ -40,6 +37,14 @@ public class AconexFetcher implements ContentFetcher {
     public StartResult start(StartContext context) {
         logger.trace("Starting Job:{}", context.getJobRunInfo().getId());
         return context.newResult();
+    }
+
+    @Override
+    public PreFetchResult preFetch(PreFetchContext context) {
+        logger.trace("Starting Job:{}", context.getJobRunInfo().getId());
+        DocumentListProcessor processor = new DocumentListProcessor(config, service);
+
+        return processor.process(context);
     }
 
     @Override
@@ -54,50 +59,10 @@ public class AconexFetcher implements ContentFetcher {
         logger.trace("Fetching input={}", input);
 
         try {
-            /*if (!input.hasId()) {
-                logger.info("FetchInput is null");
-
-                for (String project : projects) {
-                    logger.info("emitting project: {}", project);
-                    context.newCandidate(project)
-                            .withIsLeafNode(false)
-                            .withTransient(true)
-                            .metadata(m -> {
-                                        m.setString(TYPE_FIELD, "project");
-                                        m.setString(PROJECT_ID_FIELD, project);
-                                    }
-                            )
-                            .emit();
-                }
-
-                return context.newResult();
-            }*/
-
-            process(context);
         } catch (Exception e) {
             context.newError(input.getId(), String.format(ERROR_MSG, input.getId(), e.getMessage())).emit();
         }
         return context.newResult();
-    }
-
-    private void process(FetchContext context){
-        int pageNumber = 1;
-
-        for (String id : client.getProjectIds()) {
-            handleProject(context, id);
-            int pageSize = config.properties().limit().pageSize();
-            Map<String, Map<String, Object>> content = client.getDocumentsByProject(id, pageNumber, pageSize);
-            SearchResultsStats stats = client.getSearchResultsStats();
-            createNewDocuments(context, content);
-
-            while (stats.getTotalPages() > stats.getCurrentPage()) {
-                logger.info("stats:{}", stats);
-
-                content = client.getDocumentsByProject(id, ++pageNumber, pageSize);
-                stats = client.getSearchResultsStats();
-                createNewDocuments(context, content);
-            }
-        }
     }
 
     private void handleProject(FetchContext context, String project) {

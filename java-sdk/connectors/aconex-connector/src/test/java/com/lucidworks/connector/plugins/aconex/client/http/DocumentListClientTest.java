@@ -18,9 +18,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-class DocumentClientTest {
+class DocumentListClientTest {
     @InjectMocks
-    DocumentClient client;
+    DocumentListClient client;
 
     @Spy
     CloseableHttpClient httpClient = HttpClients.createDefault(); // Should be mocked
@@ -70,7 +70,7 @@ class DocumentClientTest {
 
     @Test
     void shouldReturnDocuments() throws IOException {
-        List<Document> documents = client.getDocumentsByProjectId("268447644", 1);
+        List<Document> documents = client.getDocuments("268447644", 1);
 
         assertNotNull(documents);
         assertFalse(documents.isEmpty());
@@ -80,7 +80,7 @@ class DocumentClientTest {
     void shouldReturnDocumentsWhenMaxFileSize() throws IOException {
         when(limitProperties.maxSizeBytes()).thenReturn(300000);
 
-        List<Document> documents = client.getDocumentsByProjectId("268447644", 1);
+        List<Document> documents = client.getDocuments("268447644", 1);
 
         assertNotNull(documents);
         assertTrue(documents.size() < 25);
@@ -90,7 +90,7 @@ class DocumentClientTest {
     void shouldReturnDocumentsWhenMinFileSize() throws IOException {
         when(limitProperties.maxSizeBytes()).thenReturn(800000);
 
-        List<Document> documents = client.getDocumentsByProjectId("268447644", 1);
+        List<Document> documents = client.getDocuments("268447644", 1);
 
         assertNotNull(documents);
         assertTrue(documents.size() < 25);
@@ -98,7 +98,7 @@ class DocumentClientTest {
 
     @Test
     void shouldReturnEmptyResponseWhenProjectIsInvalid() throws IOException {
-        List<Document> documents = client.getDocumentsByProjectId("fakeproject007", 1);
+        List<Document> documents = client.getDocuments("fakeproject007", 1);
 
         assertNotNull(documents);
         assertTrue(documents.isEmpty());
