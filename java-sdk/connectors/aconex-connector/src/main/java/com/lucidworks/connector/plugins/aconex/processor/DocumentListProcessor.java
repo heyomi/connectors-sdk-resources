@@ -35,17 +35,17 @@ public class DocumentListProcessor {
             final List<Project> projects = service.getProjects();
 
             for (Project p : projects) {
-                totalPages = service.getTotalPages();
+                totalPages = p.getTotalPages();
+
                 log.info("Emitting candidate -> {}:{}", p.getProjectID(), totalPages);
 
                 while(pageNumber <= totalPages) {
-                    // get documents
-                    List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
-
                     if (i >= maxItems) {
                         log.info("Max item limit reached");
                         break;
                     } else {
+                        // get documents
+                        List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
                         documents.forEach(d -> {
                             log.info("Creating candidate {}", d.getId());
 

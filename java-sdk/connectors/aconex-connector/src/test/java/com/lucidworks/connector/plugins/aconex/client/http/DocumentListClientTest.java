@@ -54,7 +54,7 @@ class DocumentListClientTest {
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
         when(authConfig.basic()).thenReturn(authProps);
         when(timeoutProps.connection()).thenReturn(30000);
-        when(limitProperties.pageSize()).thenReturn(25);
+        when(limitProperties.maxItems()).thenReturn(25);
         when(limitProperties.pageSize()).thenReturn(25);
         when(limitProperties.write()).thenReturn(-1);
         when(limitProperties.includeMetadata()).thenReturn(true);

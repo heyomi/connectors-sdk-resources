@@ -11,6 +11,4 @@ public interface AconexClient {
     List<Project> getProjects() throws IOException;
 
     List<Document> getDocuments(String projectId, int pageNumber) throws IOException;
-
-    int getTotalPages();
 }

@@ -27,16 +27,13 @@ public class AconexService implements AconexClient {
 
     @Override
     public List<Project> getProjects() throws IOException {
+        log.info("Getting projects...");
         return projectClient.getProjects();
     }
 
     @Override
     public List<Document> getDocuments(String projectId, int pageNumber) throws IOException {
+        log.info("Getting documents...");
         return documentListClient.getDocuments(projectId, pageNumber);
-    }
-
-    @Override
-    public int getTotalPages() {
-        return documentListClient.getTotalPages();
     }
 }

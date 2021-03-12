@@ -19,7 +19,8 @@ public class Constants {
     public static final int DEFAULT_PAGE_NUMBER = 1;
     public static final String DEFAULT_SORT_FIELD = "fileSize";
     public static final String SEARCH_TYPE_PAGED = "PAGED";
-    public static final String SEARCH_TYPE_NUMBERED = "PAGED";
+    public static final String SEARCH_TYPE_NUMBERED = "NUMBER_LIMITED";
+    public static final String SEARCH_TYPE_COUNT = "COUNT_ONLY";
     public static final String DEFAULT_RETURN_FIELDS = "title,filename,author,doctype,fileSize,fileType,confidential,statusid";
     public static final String RETURN_FIELDS = "approved,asBuiltRequired,attribute1,attribute2,attribute3,attribute4,author,authorisedBy,category,check1,check2,comments,comments2,confidential,contractDeliverable,contractnumber,contractordocumentnumber,contractorrev,current,date1,date2,discipline,docno,doctype,filename,fileSize,forreview,markupLastModifiedDate,milestonedate,numberOfMarkups,packagenumber,percentComplete,plannedsubmissiondate,printSize,projectField1,projectField2,projectField3,received,reference,registered,reviewed,reviewSource,reviewstatus,revision,revisiondate,scale,statusid,tagNumber,title,toclient,vdrcode,vendordocumentnumber,vendorrev";
 

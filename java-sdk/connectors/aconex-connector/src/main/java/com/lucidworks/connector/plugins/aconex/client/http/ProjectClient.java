@@ -1,10 +1,12 @@
 package com.lucidworks.connector.plugins.aconex.client.http;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
 import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Project;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
+import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -17,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -34,6 +37,7 @@ public class ProjectClient {
         ProjectList projectList = new ProjectList();
         URI uri = RestApiUriBuilder.buildProjectsUri(config.properties().host());
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
+        List<Project> projects = new ArrayList<>();
 
         // project endpoint accepts JSON
         request.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
@@ -43,13 +47,49 @@ public class ProjectClient {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     projectList = new Gson().fromJson(EntityUtils.toString(entity), ProjectList.class);
-                    log.info("Total projects: {}", projectList.getSearchResults().size());
+                    projects = projectList.getSearchResults();
+
+                    for (Project p : projects) {
+                        int totalResults = getTotalResults(p.getProjectID());
+                        int pages = getTotalPages(totalResults, config.properties().limit().pageSize());
+                        p.setTotalResults(totalResults);
+                        p.setTotalPages(pages);
+                    }
+
+                    log.info("Total projects: {}", projects.size());
                 }
             } else {
                 log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
             }
         }
 
-        return projectList.getSearchResults();
+        return projects;
+    }
+
+    private int getTotalResults(String projectId) throws IOException {
+        URI uri = RestApiUriBuilder.buildCountDocumentsUri(config.properties().host(), projectId);
+        HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
+        int totalResults = 0;
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    XmlMapper xmlMapper = new XmlMapper();
+                    RegisterSearch registerSearch = xmlMapper.readValue(EntityUtils.toString(entity), RegisterSearch.class);
+                    totalResults = registerSearch.getTotalResults();
+
+                    log.info("Total results in project: {}", totalResults);
+                }
+            } else {
+                log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
+            }
+        }
+
+        return totalResults;
+    }
+
+    private int getTotalPages(int totalResults, int pageSize) {
+        return (int) Math.ceil(totalResults / pageSize);
     }
 }

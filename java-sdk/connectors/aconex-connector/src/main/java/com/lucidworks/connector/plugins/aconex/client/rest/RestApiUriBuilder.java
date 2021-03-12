@@ -13,6 +13,16 @@ public class RestApiUriBuilder {
         return UriBuilder.fromPath(hostname).path(API).path(PROJECTS).build();
     }
 
+    public static URI buildCountDocumentsUri(@NonNull String hostname, @NonNull String projectId) {
+        return UriBuilder.fromPath(hostname)
+                .path(API)
+                .path(PROJECTS)
+                .path(projectId)
+                .path(REGISTER)
+                .queryParam(PARAM_SEARCH_TYPE, SEARCH_TYPE_COUNT)
+                .build();
+    }
+
     public static URI buildDocumentsUri(@NonNull String hostname, @NonNull String projectId) {
         return buildDocumentsUri(hostname, projectId, DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
     }

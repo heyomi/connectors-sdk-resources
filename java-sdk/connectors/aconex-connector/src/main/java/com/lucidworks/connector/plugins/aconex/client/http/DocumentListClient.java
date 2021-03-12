@@ -64,6 +64,8 @@ public class DocumentListClient {
             }
         }
 
+        log.info("Doc: {}", request.toString());
+
         return documents;
     }
 
@@ -74,10 +76,11 @@ public class DocumentListClient {
             RegisterSearch registerSearch = xmlMapper.readValue(xml, RegisterSearch.class);
             SearchResults result = registerSearch.getSearchResults();
 
+            log.info("Results {}", result.toString());
             if (result == null || result.getDocuments() == null) {
                 log.warn("Document search results empty for project.");
             } else {
-                totalPages = registerSearch.getTotalPages();
+                setTotalPages(registerSearch.getTotalPages());
                 documents = applyDocumentFilter(result.getDocuments());
             }
 
@@ -117,6 +120,10 @@ public class DocumentListClient {
         log.debug("{} files are valid documents ({})", documents.size(), DOC_FILE_TYPE);
 
         return documents;
+    }
+
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
     }
 
     public int getTotalPages() {
