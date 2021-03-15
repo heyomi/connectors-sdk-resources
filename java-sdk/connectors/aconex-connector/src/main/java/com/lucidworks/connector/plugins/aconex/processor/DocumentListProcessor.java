@@ -45,16 +45,17 @@ public class DocumentListProcessor {
 
                 totalPages = p.getTotalPages();
                 while(pageNumber <= totalPages) {
-                    log.info("On page:{} of {} with {} new candidates", pageNumber, totalPages, i);
-
-                    if (i >= maxItems) {
+                    if (maxItems >= 0 && i >= maxItems) { // SP-62: Create a better way to handle this.
                         log.info("Max item limit reached");
                         break;
                     } else {
                         // get documents
                         List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
-                        documents.forEach(d -> {
-                            // add document metadata
+                        // add document metadata
+                        for (Document d : documents) {
+
+                            if (i >= maxItems) break; // SP-62: Create a better way to handle this.
+
                             context.newCandidate(d.getId())
                                     .metadata(m -> {
                                         // Create method that does this?
@@ -76,12 +77,11 @@ public class DocumentListProcessor {
                                         m.setLong(LAST_JOB_RUN_DATE_TIME, lastJobRunDateTime);
                                     })
                                     .emit();
-                        });
+                            i++;
+                        }
                         pageNumber++;
-                        i = i + documents.size();
                     }
-
-
+                    log.info("Processed page:{} of {} with {} new candidates", pageNumber, totalPages, i);
                 }
 
             }

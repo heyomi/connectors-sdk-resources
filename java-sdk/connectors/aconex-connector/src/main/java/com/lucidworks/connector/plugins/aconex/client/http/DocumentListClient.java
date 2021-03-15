@@ -9,6 +9,7 @@ import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import com.lucidworks.connector.plugins.aconex.model.SearchResults;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,7 +44,6 @@ public class DocumentListClient {
 
         URI uri = RestApiUriBuilder.buildDocumentsUri(config.properties().host(), projectId, pageNumber, config.properties().limit().pageSize(), config.properties().project().documentReturnFields());
         if (maxItems > 0 && maxItems <= 500) { // 500 is the max for a single Aconex request
-            log.info("{} NUMBER_LIMITED query is being used", maxItems);
             uri = RestApiUriBuilder.buildLimitedDocumentsUri(config.properties().host(), projectId, maxItems, config.properties().project().documentReturnFields());
         }
 
@@ -97,14 +97,12 @@ public class DocumentListClient {
         int maxFileSize = config.properties().limit().maxSizeBytes();
         int minFileSize = config.properties().limit().minSizeBytes();
 
-        if (includedFileExtensions != null && !includedFileExtensions.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(includedFileExtensions)) {
             log.info("Applying included file type {} document filter", includedFileExtensions);
             documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType()));
-        } else {
-            if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
-                log.info("Applying excluded file type {} document filter", excludedFileExtensions);
-                documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType()));
-            }
+        } else if (CollectionUtils.isNotEmpty(excludedFileExtensions)) {
+            log.info("Applying excluded file type {} document filter", excludedFileExtensions);
+            documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType()));
         }
         
         if (excludeEmptyDocument) {
