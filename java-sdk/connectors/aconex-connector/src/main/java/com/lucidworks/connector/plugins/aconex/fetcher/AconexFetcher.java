@@ -4,25 +4,24 @@ import com.lucidworks.connector.plugins.aconex.client.AconexClient;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.processor.DocumentListProcessor;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.FetchResult;
-import com.lucidworks.fusion.connector.plugin.api.fetcher.result.PreFetchResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StartResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.result.StopResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.type.content.ContentFetcher;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.type.content.FetchInput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
+@Slf4j
 public class AconexFetcher implements ContentFetcher {
-
-    private static final Logger logger = LoggerFactory.getLogger(AconexFetcher.class);
     private static final String ERROR_MSG = "Item=%s failed with error=%s";
+
     private final AconexClient service;
     private final AconexConfig config;
     private List<String> projects;
@@ -35,30 +34,45 @@ public class AconexFetcher implements ContentFetcher {
 
     @Override
     public StartResult start(StartContext context) {
-        logger.trace("Starting Job:{}", context.getJobRunInfo().getId());
+        log.trace("Starting Job:{}", context.getJobRunInfo().getId());
         return context.newResult();
     }
 
     @Override
-    public PreFetchResult preFetch(PreFetchContext context) {
-        logger.trace("Starting Job:{}", context.getJobRunInfo().getId());
-        DocumentListProcessor processor = new DocumentListProcessor(config, service);
-
-        return processor.process(context);
-    }
-
-    @Override
     public StopResult stop(StopContext context) {
-        logger.trace("Stopping Job:{}", context.getJobRunInfo().getId());
+        log.trace("Stopping Job:{}", context.getJobRunInfo().getId());
         return context.newResult();
     }
 
     @Override
     public FetchResult fetch(FetchContext context) {
         FetchInput input = context.getFetchInput();
-        logger.trace("Fetching input={}", input);
+        Map<String, Object> metaData = input.getMetadata();
+        log.trace("Fetching input={}", input);
 
         try {
+            if (!input.hasId() || input.getId().startsWith(CHECKPOINT_PREFIX)) {
+                long currentJobRunDateTime = Instant.now().toEpochMilli();
+                long lastJobRunDateTime = 0;
+                if (metaData.containsKey(LAST_JOB_RUN_DATE_TIME)) {
+                    // extract the lastJobRunDateTime from the checkpoint coming from crawlDb
+                    // it represents the last time a job was run (previous to this current crawl)
+                    lastJobRunDateTime = (Long) metaData.get(LAST_JOB_RUN_DATE_TIME);
+                }
+
+                DocumentListProcessor processor = new DocumentListProcessor(context, config, service, lastJobRunDateTime);
+                processor.createNewCandidates();
+
+                // add/update the checkpoint
+                /* emitCheckpoint(
+                        context,
+                        currentJobRunDateTime,
+                        getEntryIndexStart(input),
+                        getEntryIndexEnd(input)
+                ); */
+            } else {
+                // processFeedEntry(fetchContext, input, metaData);
+            }
         } catch (Exception e) {
             context.newError(input.getId(), String.format(ERROR_MSG, input.getId(), e.getMessage())).emit();
         }
@@ -66,7 +80,7 @@ public class AconexFetcher implements ContentFetcher {
     }
 
     private void handleProject(FetchContext context, String project) {
-        logger.info("emitting project: {}", project);
+        log.info("emitting project: {}", project);
         context.newCandidate(project)
                 .withIsLeafNode(false)
                 .withTransient(true)
@@ -81,7 +95,7 @@ public class AconexFetcher implements ContentFetcher {
     private void createNewDocuments(FetchContext context, Map<String, Map<String, Object>> content) {
         content.keySet().forEach(key -> {
             Map<String, Object> data = content.get(key);
-            logger.info("creating doc key:{}", key);
+            log.info("creating doc key:{}", key);
             context.newDocument(key)
                     .fields(f -> {
                         f.setLong("timestamp", ZonedDateTime.now().toEpochSecond());
@@ -92,7 +106,7 @@ public class AconexFetcher implements ContentFetcher {
     }
 
     private void emitCheckpoint(FetchContext context, int pageNumber, int totalResults, int totalPages, int totalOnPage) {
-        logger.info("Emit Checkpoint");
+        log.info("Emit Checkpoint");
         context.newCheckpoint(CHECKPOINT_PREFIX)
                 .metadata(m -> {
                     // m.setInteger(TOTAL_INDEXED, totalIndexed);

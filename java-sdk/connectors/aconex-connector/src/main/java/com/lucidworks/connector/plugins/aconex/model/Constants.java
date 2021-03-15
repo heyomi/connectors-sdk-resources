@@ -22,7 +22,11 @@ public class Constants {
     public static final String SEARCH_TYPE_NUMBERED = "NUMBER_LIMITED";
     public static final String SEARCH_TYPE_COUNT = "COUNT_ONLY";
     public static final String DEFAULT_RETURN_FIELDS = "title,filename,author,doctype,fileSize,fileType,confidential,statusid";
-    public static final String RETURN_FIELDS = "approved,asBuiltRequired,attribute1,attribute2,attribute3,attribute4,author,authorisedBy,category,check1,check2,comments,comments2,confidential,contractDeliverable,contractnumber,contractordocumentnumber,contractorrev,current,date1,date2,discipline,docno,doctype,filename,fileSize,forreview,markupLastModifiedDate,milestonedate,numberOfMarkups,packagenumber,percentComplete,plannedsubmissiondate,printSize,projectField1,projectField2,projectField3,received,reference,registered,reviewed,reviewSource,reviewstatus,revision,revisiondate,scale,statusid,tagNumber,title,toclient,vdrcode,vendordocumentnumber,vendorrev";
+    public static final String RETURN_FIELDS = "approved,asBuiltRequired,attribute1,attribute2,attribute3,attribute4,author,authorisedBy,category,check1,check2," +
+            "comments,comments2,confidential,contractDeliverable,contractnumber,contractordocumentnumber,contractorrev,current,date1,date2,discipline,docno,doctype," +
+            "filename,fileSize,forreview,markupLastModifiedDate,milestonedate,numberOfMarkups,packagenumber,percentComplete,plannedsubmissiondate,printSize," +
+            "projectField1,projectField2,projectField3,received,reference,registered,reviewed,reviewSource,reviewstatus,revision,revisiondate,scale,statusid," +
+            "tagNumber,title,toclient,vdrcode,vendordocumentnumber,vendorrev,selectlist1,selectlist2,selectlist3,selectlist4,selectlist5,selectlist6,selectlist7,selectlist8,selectlist9";
 
     public static final int TIMEOUT_MS = 10000;
     public static final String IMAGE_FILE_TYPE = "jpg,jpeg,png,gif";
@@ -40,4 +44,8 @@ public class Constants {
     public static final String PROJECT_ID_FIELD = "_aconex_project_id";
     public static final String PROJECT_NAME_FIELD = "_aconex_project_name";
     public static final String DOCUMENT_ID_FIELD = "_aconex_document_id";
+    public final static String LAST_JOB_RUN_DATE_TIME = "lastJobRunDateTime";
+    public final static String ENTRY_LAST_UPDATED = "lastUpdatedEntry";
+    public final static String ENTRY_INDEX_START = "entryIndexStart";
+    public final static String ENTRY_INDEX_END = "entryIndexEnd";
 }

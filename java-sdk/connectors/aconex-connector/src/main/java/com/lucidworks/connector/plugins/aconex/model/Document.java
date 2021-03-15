@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,29 +33,30 @@ public class Document {
     @JacksonXmlProperty(localName = "Category")
     private String category;
     @JacksonXmlProperty(localName = "DateModified")
-    private String dateModified;
+    private Date dateModified;
     @JacksonXmlProperty(localName = "Discipline")
     private String discipline;
-    @JacksonXmlProperty(localName = "SelectListList1")
+    @JacksonXmlProperty(localName = "SelectList1")
     private String select1;
-    @JacksonXmlProperty(localName = "SelectListList2")
+    @JacksonXmlProperty(localName = "SelectList2")
     private String select2;
-    @JacksonXmlProperty(localName = "SelectListList3")
+    @JacksonXmlProperty(localName = "SelectList3")
     private String select3;
-    @JacksonXmlProperty(localName = "SelectListList4")
+    @JacksonXmlProperty(localName = "SelectList4")
     private String select4;
-    @JacksonXmlProperty(localName = "SelectListList5")
+    @JacksonXmlProperty(localName = "SelectList5")
     private String select5;
-    @JacksonXmlProperty(localName = "SelectListList6")
+    @JacksonXmlProperty(localName = "SelectList6")
     private String select6;
-    @JacksonXmlProperty(localName = "SelectListList7")
+    @JacksonXmlProperty(localName = "SelectList7")
     private String select7;
-    @JacksonXmlProperty(localName = "SelectListList8")
+    @JacksonXmlProperty(localName = "SelectList8")
     private String select8;
-    @JacksonXmlProperty(localName = "SelectListList9")
+    @JacksonXmlProperty(localName = "SelectList9")
     private String select9;
 
     private String url;
+    private long lastUpdated;
 
     public void setUrl(String projectId) {
         this.url = RestApiUriBuilder.buildDocumentViewerUri(projectId, id);

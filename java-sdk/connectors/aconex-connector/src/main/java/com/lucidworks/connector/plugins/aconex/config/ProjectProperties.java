@@ -8,6 +8,7 @@ import com.lucidworks.fusion.schema.UIHints;
 import java.util.List;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_RETURN_FIELDS;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.RETURN_FIELDS;
 
 public interface ProjectProperties extends Model {
     @Property(
@@ -23,7 +24,7 @@ public interface ProjectProperties extends Model {
     @Property(
             title = "Document Return Fields",
             description = "The search API service allows you to request specific data for each search result if required." +
-                    "Default: " + DEFAULT_RETURN_FIELDS,
+                    "Default: " + RETURN_FIELDS,
             order = 2,
             hints = { UIHints.ADVANCED }
     )

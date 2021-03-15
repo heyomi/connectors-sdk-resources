@@ -4,25 +4,31 @@ import com.lucidworks.connector.plugins.aconex.client.AconexClient;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.Project;
-import com.lucidworks.fusion.connector.plugin.api.fetcher.result.PreFetchResult;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.type.content.ContentFetcher;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.lucidworks.connector.plugins.aconex.model.Constants.ENTRY_LAST_UPDATED;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.LAST_JOB_RUN_DATE_TIME;
+
 @Slf4j
 public class DocumentListProcessor {
 
+    private final ContentFetcher.FetchContext context;
     private final AconexConfig config;
     private final AconexClient service;
+    private final long lastJobRunDateTime;
 
-    public DocumentListProcessor(AconexConfig config, AconexClient service) {
+    public DocumentListProcessor(ContentFetcher.FetchContext context, AconexConfig config, AconexClient service, long lastJobRunDateTime) {
+        this.context = context;
         this.config = config;
         this.service = service;
+        this.lastJobRunDateTime = lastJobRunDateTime;
     }
 
-    public PreFetchResult process(ContentFetcher.PreFetchContext context) {
+    public void createNewCandidates() {
         log.trace("Starting Job:{}", context.getJobRunInfo().getId());
 
         int totalPages = 1;
@@ -37,8 +43,6 @@ public class DocumentListProcessor {
             for (Project p : projects) {
                 totalPages = p.getTotalPages();
 
-                log.info("Emitting candidate -> {}:{}", p.getProjectID(), totalPages);
-
                 while(pageNumber <= totalPages) {
                     if (i >= maxItems) {
                         log.info("Max item limit reached");
@@ -47,8 +51,6 @@ public class DocumentListProcessor {
                         // get documents
                         List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
                         documents.forEach(d -> {
-                            log.info("Creating candidate {}", d.getId());
-
                             // add document metadata
                             context.newCandidate(d.getId())
                                     .metadata(m -> {
@@ -61,8 +63,15 @@ public class DocumentListProcessor {
                                         m.setString("file_type", d.getFileType());
                                         m.setInteger("file_size", d.getFileSize());
                                         m.setString("url", d.getUrl());
+                                        m.setLong("dateModified", d.getDateModified().getTime());
+                                        // add last time when entry was modified
+                                        m.setLong(ENTRY_LAST_UPDATED, d.getLastUpdated());
+                                        // add 'lastJobRunDateTime'.
+                                        m.setLong(LAST_JOB_RUN_DATE_TIME, lastJobRunDateTime);
                                     })
                                     .emit();
+
+                            log.info("Emitting candidate {}:{}", p.getProjectID(), d.getId());
                         });
                         pageNumber++;
                         i = i + documents.size();
@@ -73,7 +82,5 @@ public class DocumentListProcessor {
         } catch (IOException e) {
             log.error("An error occurred", e);
         }
-
-        return context.newResult();
     }
 }

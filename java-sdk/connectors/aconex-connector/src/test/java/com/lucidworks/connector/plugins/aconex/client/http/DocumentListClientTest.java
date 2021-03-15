@@ -56,12 +56,12 @@ class DocumentListClientTest {
         when(timeoutProps.connection()).thenReturn(30000);
         when(limitProperties.maxItems()).thenReturn(25);
         when(limitProperties.pageSize()).thenReturn(25);
+        when(limitProperties.excludeEmptyDocument()).thenReturn(true);
         when(limitProperties.write()).thenReturn(-1);
-        when(limitProperties.includeMetadata()).thenReturn(true);
         when(properties.auth()).thenReturn(authConfig);
         when(properties.timeout()).thenReturn(timeoutProps);
         when(properties.limit()).thenReturn(limitProperties);
-        when(projectProperties.documentReturnFields()).thenReturn(Constants.DEFAULT_RETURN_FIELDS);
+        when(projectProperties.documentReturnFields()).thenReturn(Constants.RETURN_FIELDS);
         when(properties.project()).thenReturn(projectProperties);
         when(properties.host()).thenReturn("https://uk1.aconex.co.uk");
         when(properties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
@@ -74,6 +74,16 @@ class DocumentListClientTest {
 
         assertNotNull(documents);
         assertFalse(documents.isEmpty());
+    }
+
+    @Test
+    void shouldReturnDocumentsWhenEmptyFile() throws IOException {
+        when(limitProperties.includeMetadata()).thenReturn(true);
+
+        List<Document> documents = client.getDocuments("268447644", 1);
+
+        assertNotNull(documents);
+        assertTrue(documents.size() < 25);
     }
 
     @Test

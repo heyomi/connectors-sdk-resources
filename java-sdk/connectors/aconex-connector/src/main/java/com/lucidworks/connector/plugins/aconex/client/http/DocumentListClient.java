@@ -94,30 +94,37 @@ public class DocumentListClient {
     private List<Document> applyDocumentFilter(@NonNull List<Document> documents) {
         Set<String> includedFileExtensions = config.properties().limit().includedFileExtensions();
         Set<String> excludedFileExtensions = config.properties().limit().excludedFileExtensions();
+        boolean excludeEmptyDocument = config.properties().limit().excludeEmptyDocument();
         int maxFileSize = config.properties().limit().maxSizeBytes();
         int minFileSize = config.properties().limit().minSizeBytes();
 
-        log.debug("{} files returned", documents.size());
+        log.info("{} files returned", documents.size());
 
         if (includedFileExtensions != null && !includedFileExtensions.isEmpty()) {
-            log.debug("Applying included file type [{}] document filter", includedFileExtensions);
+            log.info("Applying included file type [{}] document filter", includedFileExtensions);
             documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType().toLowerCase()));
         } else if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
-            log.debug("Applying excluded file type [{}] document filter", excludedFileExtensions);
+            log.info("Applying excluded file type [{}] document filter", excludedFileExtensions);
             documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType().toLowerCase()));
+        }
+        
+        if (excludeEmptyDocument) {
+            //SP-57: 1348828088672012186 1348828088682002271
+            log.info("Applying excluded empty file type [{}] document filter", excludedFileExtensions);
+            documents.removeIf(doc -> doc.getFileSize() <= 0);
         }
 
         if (maxFileSize > 0) {
-            log.debug("Applying max file size [{}] document filter", maxFileSize);
+            log.info("Applying max file size [{}] document filter", maxFileSize);
             documents.removeIf(doc -> doc.getFileSize() > maxFileSize);
         }
 
         if (minFileSize > 0) {
-            log.debug("Applying min file size [{}] document filter", minFileSize);
+            log.info("Applying min file size [{}] document filter", minFileSize);
             documents.removeIf(doc -> doc.getFileSize() < minFileSize);
         }
 
-        log.debug("{} files are valid documents ({})", documents.size(), DOC_FILE_TYPE);
+        log.info("{} files are valid documents ({})", documents.size(), DOC_FILE_TYPE);
 
         return documents;
     }
