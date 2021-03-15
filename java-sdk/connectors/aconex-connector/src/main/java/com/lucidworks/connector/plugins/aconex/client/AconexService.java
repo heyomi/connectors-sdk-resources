@@ -9,6 +9,7 @@ import com.lucidworks.connector.plugins.aconex.model.Project;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Slf4j
@@ -33,5 +34,10 @@ public class AconexService implements AconexClient {
     @Override
     public List<Document> getDocuments(String projectId, int pageNumber) throws IOException {
         return documentListClient.getDocuments(projectId, pageNumber);
+    }
+
+    @Override
+    public InputStream getDocument(String projectId, String documentId) throws IOException {
+        return documentClient.getDocumentContent(projectId, documentId);
     }
 }

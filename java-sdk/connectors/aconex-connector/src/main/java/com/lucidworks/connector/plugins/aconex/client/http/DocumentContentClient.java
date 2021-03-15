@@ -25,7 +25,7 @@ public class DocumentContentClient {
     }
 
     public InputStream getDocumentContent(String projectId, String documentId) throws IOException {
-        log.info("Crawling doc:{}", documentId);
+        log.info("Getting document content:{}", documentId);
 
         URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(config.properties().host(), projectId, documentId);
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);

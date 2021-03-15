@@ -54,9 +54,7 @@ public class DocumentListClient {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     documents = getDocumentsFromXMLResponse(EntityUtils.toString(entity));
-                    documents.forEach(d -> {
-                        d.setUrl(projectId);
-                    });
+                    documents.forEach(d -> d.setUrl(projectId));
                 }
             } else {
                 log.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response != null ? response.getStatusLine() : null);

@@ -34,7 +34,7 @@ public class ProjectClient {
     }
 
     public List<Project> getProjects() throws IOException {
-        ProjectList projectList = new ProjectList();
+        ProjectList projectList;
         URI uri = RestApiUriBuilder.buildProjectsUri(config.properties().host());
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
         List<Project> projects = new ArrayList<>();

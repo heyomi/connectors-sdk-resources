@@ -18,7 +18,6 @@ class AconexHttpClientTest {
     AconexHttpClientOptions options;
 
     private final String projectId = "268447644";
-    private final String documentId = "1348828088686947792";
 
     @BeforeEach
     public void setup() {
@@ -50,7 +49,7 @@ class AconexHttpClientTest {
 
     @Test
     void shouldReturnDocumentContent() {
-        byte[] document = client.getDocument(projectId, documentId);
+        byte[] document = client.getDocument(projectId, "1348828088686947792");
 
         assertNotNull(document);
     }
