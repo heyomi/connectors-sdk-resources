@@ -43,7 +43,12 @@ public class DocumentListProcessor {
             for (Project p : projects) {
                 totalPages = p.getTotalPages();
 
+                log.info("Starting on project:{}", p.getProjectID());
+
                 while(pageNumber <= totalPages) {
+
+                    log.info("On page:{} of {}", pageNumber, totalPages);
+
                     if (i >= maxItems) {
                         log.info("Max item limit reached");
                         break;
@@ -71,11 +76,13 @@ public class DocumentListProcessor {
                                     })
                                     .emit();
 
-                            log.info("Emitting candidate {}:{}", p.getProjectID(), d.getId());
+                            log.info("Emitting candidate {}", d.getId());
                         });
                         pageNumber++;
                         i = i + documents.size();
                     }
+
+
                 }
 
             }

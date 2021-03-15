@@ -7,7 +7,6 @@ import com.lucidworks.fusion.schema.UIHints;
 
 import java.util.List;
 
-import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_RETURN_FIELDS;
 import static com.lucidworks.connector.plugins.aconex.model.Constants.RETURN_FIELDS;
 
 public interface ProjectProperties extends Model {
@@ -28,6 +27,6 @@ public interface ProjectProperties extends Model {
             order = 2,
             hints = { UIHints.ADVANCED }
     )
-    @SchemaAnnotations.StringSchema(minLength = 1, defaultValue = DEFAULT_RETURN_FIELDS)
+    @SchemaAnnotations.StringSchema(minLength = 1, defaultValue = RETURN_FIELDS)
     String documentReturnFields();
 }

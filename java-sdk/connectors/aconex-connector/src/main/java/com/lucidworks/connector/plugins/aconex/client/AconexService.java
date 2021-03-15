@@ -33,7 +33,7 @@ public class AconexService implements AconexClient {
 
     @Override
     public List<Document> getDocuments(String projectId, int pageNumber) throws IOException {
-        log.info("Getting documents...");
+        log.info("Getting documents from {} on page:{}", projectId, pageNumber);
         return documentListClient.getDocuments(projectId, pageNumber);
     }
 }

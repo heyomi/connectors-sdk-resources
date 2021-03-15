@@ -56,7 +56,7 @@ class DocumentListClientTest {
         when(timeoutProps.connection()).thenReturn(30000);
         when(limitProperties.maxItems()).thenReturn(25);
         when(limitProperties.pageSize()).thenReturn(25);
-        when(limitProperties.excludeEmptyDocument()).thenReturn(true);
+        when(limitProperties.excludeEmptyDocuments()).thenReturn(true);
         when(limitProperties.write()).thenReturn(-1);
         when(properties.auth()).thenReturn(authConfig);
         when(properties.timeout()).thenReturn(timeoutProps);

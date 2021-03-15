@@ -63,11 +63,11 @@ public interface LimitProperties extends Model {
     boolean includeMetadata();
 
     @Property(
-            title = "Exclude Empty Document",
+            title = "Exclude Empty Documents",
             description = "Prevents 'CANNOT_DOWNLOAD_EMPTY_DOCUMENT' error. Cannot download a registered document which does not have a backing file",
             order = 6)
     @BooleanSchema(defaultValue = true)
-    boolean excludeEmptyDocument();
+    boolean excludeEmptyDocuments();
 
     @Property(
             title = "Included file extensions",

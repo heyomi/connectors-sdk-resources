@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static com.lucidworks.connector.plugins.aconex.model.Constants.DOC_FILE_TYPE;
-
 @Slf4j
 public class DocumentListClient {
     private final CloseableHttpClient httpClient;
@@ -64,7 +62,7 @@ public class DocumentListClient {
             }
         }
 
-        log.info("Doc: {}", request.toString());
+        log.info("{} documents processed", documents.size());
 
         return documents;
     }
@@ -76,7 +74,6 @@ public class DocumentListClient {
             RegisterSearch registerSearch = xmlMapper.readValue(xml, RegisterSearch.class);
             SearchResults result = registerSearch.getSearchResults();
 
-            log.info("Results {}", result.toString());
             if (result == null || result.getDocuments() == null) {
                 log.warn("Document search results empty for project.");
             } else {
@@ -92,39 +89,43 @@ public class DocumentListClient {
     }
 
     private List<Document> applyDocumentFilter(@NonNull List<Document> documents) {
+
+        log.info(String.valueOf(config.properties().limit().excludedFileExtensions()));
         Set<String> includedFileExtensions = config.properties().limit().includedFileExtensions();
         Set<String> excludedFileExtensions = config.properties().limit().excludedFileExtensions();
-        boolean excludeEmptyDocument = config.properties().limit().excludeEmptyDocument();
+        boolean excludeEmptyDocument = config.properties().limit().excludeEmptyDocuments();
         int maxFileSize = config.properties().limit().maxSizeBytes();
         int minFileSize = config.properties().limit().minSizeBytes();
 
-        log.info("{} files returned", documents.size());
+        log.info("{} documents found", documents.size());
 
         if (includedFileExtensions != null && !includedFileExtensions.isEmpty()) {
-            log.info("Applying included file type [{}] document filter", includedFileExtensions);
-            documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType().toLowerCase()));
-        } else if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
-            log.info("Applying excluded file type [{}] document filter", excludedFileExtensions);
-            documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType().toLowerCase()));
+            log.info("Applying included file type {} document filter", includedFileExtensions);
+            documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType()));
+        } else {
+            if (excludedFileExtensions != null && excludedFileExtensions.isEmpty()) {
+                log.info("Applying excluded file type {} document filter", excludedFileExtensions);
+                documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType()));
+            }
         }
         
         if (excludeEmptyDocument) {
             //SP-57: 1348828088672012186 1348828088682002271
-            log.info("Applying excluded empty file type [{}] document filter", excludedFileExtensions);
+            log.info("Applying excluded empty file type {} document filter", excludedFileExtensions);
             documents.removeIf(doc -> doc.getFileSize() <= 0);
         }
 
         if (maxFileSize > 0) {
-            log.info("Applying max file size [{}] document filter", maxFileSize);
+            log.info("Applying max file size {} document filter", maxFileSize);
             documents.removeIf(doc -> doc.getFileSize() > maxFileSize);
         }
 
         if (minFileSize > 0) {
-            log.info("Applying min file size [{}] document filter", minFileSize);
+            log.info("Applying min file size {} document filter", minFileSize);
             documents.removeIf(doc -> doc.getFileSize() < minFileSize);
         }
 
-        log.info("{} files are valid documents ({})", documents.size(), DOC_FILE_TYPE);
+        log.info("{} files are valid documents", documents.size());
 
         return documents;
     }

@@ -39,7 +39,7 @@ public class RestApiUriBuilder {
         uriBuilder.queryParam(PARAM_SEARCH_TYPE, SEARCH_TYPE_PAGED)
                 .queryParam(PARAM_PAGE_SIZE, pageSize)
                 .queryParam(PARAM_PAGE_NUMBER, pageNumber)
-                .queryParam(PARAM_RETURN_FIELDS, DEFAULT_RETURN_FIELDS);
+                .queryParam(PARAM_RETURN_FIELDS, RETURN_FIELDS);
 
         return uriBuilder.build();
     }

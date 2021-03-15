@@ -79,19 +79,6 @@ public class AconexFetcher implements ContentFetcher {
         return context.newResult();
     }
 
-    private void handleProject(FetchContext context, String project) {
-        log.info("emitting project: {}", project);
-        context.newCandidate(project)
-                .withIsLeafNode(false)
-                .withTransient(true)
-                .metadata(m -> {
-                            m.setString(TYPE_FIELD, "project");
-                            m.setString(PROJECT_ID_FIELD, project);
-                        }
-                )
-                .emit();
-    }
-
     private void createNewDocuments(FetchContext context, Map<String, Map<String, Object>> content) {
         content.keySet().forEach(key -> {
             Map<String, Object> data = content.get(key);
