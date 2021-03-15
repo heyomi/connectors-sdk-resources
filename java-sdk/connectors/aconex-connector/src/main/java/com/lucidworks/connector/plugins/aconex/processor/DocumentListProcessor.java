@@ -41,13 +41,11 @@ public class DocumentListProcessor {
             final List<Project> projects = service.getProjects();
 
             for (Project p : projects) {
-                totalPages = p.getTotalPages();
-
                 log.info("Starting on project:{}", p.getProjectID());
 
+                totalPages = p.getTotalPages();
                 while(pageNumber <= totalPages) {
-
-                    log.info("On page:{} of {}", pageNumber, totalPages);
+                    log.info("On page:{} of {} with {} new candidates", pageNumber, totalPages, i);
 
                     if (i >= maxItems) {
                         log.info("Max item limit reached");
@@ -59,6 +57,7 @@ public class DocumentListProcessor {
                             // add document metadata
                             context.newCandidate(d.getId())
                                     .metadata(m -> {
+                                        // Create method that does this?
                                         m.setString("title", d.getTitle());
                                         m.setString("category", d.getCategory());
                                         m.setString("discipline", d.getDiscipline());
@@ -69,14 +68,14 @@ public class DocumentListProcessor {
                                         m.setInteger("file_size", d.getFileSize());
                                         m.setString("url", d.getUrl());
                                         m.setLong("dateModified", d.getDateModified().getTime());
+                                        m.setString("select_list2", d.getSelect2());
+                                        m.setString("select_list8", d.getSelect8());
                                         // add last time when entry was modified
                                         m.setLong(ENTRY_LAST_UPDATED, d.getLastUpdated());
                                         // add 'lastJobRunDateTime'.
                                         m.setLong(LAST_JOB_RUN_DATE_TIME, lastJobRunDateTime);
                                     })
                                     .emit();
-
-                            log.info("Emitting candidate {}", d.getId());
                         });
                         pageNumber++;
                         i = i + documents.size();

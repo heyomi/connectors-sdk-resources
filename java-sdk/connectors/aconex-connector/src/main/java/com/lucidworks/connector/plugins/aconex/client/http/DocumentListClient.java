@@ -43,6 +43,7 @@ public class DocumentListClient {
 
         URI uri = RestApiUriBuilder.buildDocumentsUri(config.properties().host(), projectId, pageNumber, config.properties().limit().pageSize(), config.properties().project().documentReturnFields());
         if (maxItems > 0 && maxItems <= 500) { // 500 is the max for a single Aconex request
+            log.info("{} NUMBER_LIMITED query is being used", maxItems);
             uri = RestApiUriBuilder.buildLimitedDocumentsUri(config.properties().host(), projectId, maxItems, config.properties().project().documentReturnFields());
         }
 
@@ -77,6 +78,7 @@ public class DocumentListClient {
             if (result == null || result.getDocuments() == null) {
                 log.warn("Document search results empty for project.");
             } else {
+                log.info("{} documents found", result.getDocuments().size());
                 setTotalPages(registerSearch.getTotalPages());
                 documents = applyDocumentFilter(result.getDocuments());
             }
@@ -89,21 +91,17 @@ public class DocumentListClient {
     }
 
     private List<Document> applyDocumentFilter(@NonNull List<Document> documents) {
-
-        log.info(String.valueOf(config.properties().limit().excludedFileExtensions()));
         Set<String> includedFileExtensions = config.properties().limit().includedFileExtensions();
         Set<String> excludedFileExtensions = config.properties().limit().excludedFileExtensions();
         boolean excludeEmptyDocument = config.properties().limit().excludeEmptyDocuments();
         int maxFileSize = config.properties().limit().maxSizeBytes();
         int minFileSize = config.properties().limit().minSizeBytes();
 
-        log.info("{} documents found", documents.size());
-
         if (includedFileExtensions != null && !includedFileExtensions.isEmpty()) {
             log.info("Applying included file type {} document filter", includedFileExtensions);
             documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType()));
         } else {
-            if (excludedFileExtensions != null && excludedFileExtensions.isEmpty()) {
+            if (excludedFileExtensions != null && !excludedFileExtensions.isEmpty()) {
                 log.info("Applying excluded file type {} document filter", excludedFileExtensions);
                 documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType()));
             }
@@ -124,8 +122,6 @@ public class DocumentListClient {
             log.info("Applying min file size {} document filter", minFileSize);
             documents.removeIf(doc -> doc.getFileSize() < minFileSize);
         }
-
-        log.info("{} files are valid documents", documents.size());
 
         return documents;
     }
