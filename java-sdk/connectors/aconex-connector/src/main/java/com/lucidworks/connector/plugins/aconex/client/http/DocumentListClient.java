@@ -11,6 +11,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -23,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The service executes a search of an organization's document register for a project.
+ * @see <a href="https://help.aconex.com/api-developer-guide/document#list-documents">List Documents</a>
+ */
 @Slf4j
 public class DocumentListClient {
     private final CloseableHttpClient httpClient;
@@ -49,14 +54,14 @@ public class DocumentListClient {
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     documents = getDocumentsFromXMLResponse(EntityUtils.toString(entity));
                     documents.forEach(d -> d.setUrl(config.properties().api().host(), projectId));
                 }
             } else {
-                log.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response != null ? response.getStatusLine() : null);
+                log.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response.getStatusLine());
             }
         }
 

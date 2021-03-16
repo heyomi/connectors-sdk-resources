@@ -7,7 +7,7 @@ import com.lucidworks.fusion.schema.UIHints;
 public interface AconexProperties extends Model {
 
     @Property(
-            title = "Aconex Instance Options",
+            title = "Aconex Instance Details",
             // description = "Options for configuring project retrieval.",
             order = 1,
             required = true

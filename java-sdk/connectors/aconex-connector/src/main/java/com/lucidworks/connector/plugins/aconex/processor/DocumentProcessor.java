@@ -38,54 +38,30 @@ public class DocumentProcessor {
             final List<Project> projects = service.getProjects();
 
             for (Project p : projects) {
-                log.debug("Starting on project:{}", p.getProjectID());
+                log.info("Starting on project:{}", p.getProjectID());
 
                 totalPages = p.getTotalPages();
-                while(pageNumber <= totalPages) {
-                    if (maxItems >= 0 && i >= maxItems) { // SP-62: Create a better way to handle this.
-                        log.debug("Max item limit reached");
-                        break;
-                    } else {
-                        // get documents
-                        List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
-                        // add document content
-                        for (Document d : documents) {
-                            if (i >= maxItems) break; // SP-62: Create a better way to handle this.
-                            context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId()))
-                                    .fields(f -> {
-                                        // Create method that does this?
-                                        f.setString("_aconex_title_t", d.getTitle());
-                                        f.setBoolean("confidential", d.isConfidential());
-                                        f.setString("category", d.getCategory());
-                                        f.setString("package", d.getCategory());
-                                        f.setString("discipline", d.getDiscipline());
-                                        f.setString("project_code", d.getDiscipline());
-                                        f.setString("document_id", d.getId());
-                                        f.setString("document_type", d.getDocumentType());
-                                        f.setString("document_status", d.getDocumentStatus());
-                                        f.setString("project_id", p.getProjectID());
-                                        f.setString("project_name", p.getProjectName());
-                                        f.setString("file_name", d.getFilename());
-                                        f.setString("file_type", d.getFileType());
-                                        f.setInteger("file_size", d.getFileSize());
-                                        f.setString("url", d.getUrl());
-                                        f.setLong("dateModified", d.getDateModified().getTime());
-                                        f.setDate("dateModified", d.getDateModified());
-                                        f.setString("select_list2", d.getSelect2());
-                                        f.setString("functional_area", d.getSelect2());
-                                        f.setString("select_list8", d.getSelect8());
-                                        f.setString("related_provider", d.getSelect8());
-                                        f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
-                                    })
-                                    .metadata(m -> m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli()))
-                                    .emit();
-                            i++;
-                        }
-                        pageNumber++;
-                    }
-                    log.debug("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
-                }
+                while (pageNumber <= totalPages) {
+                    // get documents
+                    List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
 
+                    // add document content
+                    for (Document d : documents) {
+                        if (maxItems > -1 && i >= maxItems) break; // SP-62: Create a better way to handle this.
+                        context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId()))
+                                .fields(f -> {
+                                    f.merge(d.toMetadata());
+                                    f.setString("project_id_t", p.getProjectID());
+                                    f.setString("project_name_t", p.getProjectName());
+                                    f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
+                                })
+                                .metadata(m -> m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli()))
+                                .emit();
+                        i++;
+                    }
+                    pageNumber++;
+                }
+                log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
             }
         } catch (IOException e) {
             log.error("An error occurred", e);

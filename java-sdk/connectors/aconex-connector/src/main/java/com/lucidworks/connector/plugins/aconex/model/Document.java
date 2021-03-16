@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
@@ -64,5 +66,30 @@ public class Document {
 
     public void setUrl(String host, String projectId) {
         this.url = RestApiUriBuilder.buildDocumentViewerUri(host, projectId, this.trackingId);
+    }
+
+    public Map<String, Object> toMetadata() {
+        Map<String, Object> document = new HashMap<>();
+        document.put("_aconex_title_t", getTitle());
+        document.put("confidential_b", isConfidential());
+        document.put("category_t", getCategory());
+        document.put("package_t", getCategory());
+        document.put("discipline_t", getDiscipline());
+        document.put("project_code_t", getDiscipline());
+        document.put("document_id_t", getId());
+        document.put("document_type_t", getDocumentType());
+        document.put("document_status_t", getDocumentStatus());
+        document.put("file_name_t", getFilename());
+        document.put("file_type_t", getFileType());
+        document.put("file_size_l", getFileSize());
+        document.put("url_t", getUrl());
+        document.put("dateModified_l", getDateModified().getTime());
+        document.put("dateModified_dt", getDateModified());
+        document.put("select_list2_t", getSelect2());
+        document.put("functional_area_t", getSelect2());
+        document.put("select_list8_t", getSelect8());
+        document.put("related_provider_t", getSelect8());
+        
+        return document;
     }
 }

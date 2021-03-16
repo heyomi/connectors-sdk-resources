@@ -15,6 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+/**
+ * The service retrieves the backing file associated with the specified document.
+ * @see <a href="https://help.aconex.com/api-developer-guide/document#download-document-file">Download Document File</a>
+ */
 @Slf4j
 public class DocumentContentClient {
     private final CloseableHttpClient httpClient;
@@ -28,7 +32,6 @@ public class DocumentContentClient {
 
     public InputStream getDocumentContent(String projectId, String documentId) throws IOException {
         log.debug("Getting document content:{}", documentId);
-
 
         URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(config.properties().api().host(), projectId, documentId);
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);

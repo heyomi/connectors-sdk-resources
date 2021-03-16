@@ -10,6 +10,7 @@ import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -23,6 +24,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The service executes a search of an organization's list of projects.
+ * @see <a href="https://help.aconex.com/aconex/aconex-apis/api-documentation/projects">Projects</a>
+ */
 @Slf4j
 public class ProjectClient {
     private final CloseableHttpClient httpClient;
@@ -44,7 +49,7 @@ public class ProjectClient {
         request.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     projectList = new Gson().fromJson(EntityUtils.toString(entity), ProjectList.class);
@@ -67,7 +72,7 @@ public class ProjectClient {
                     log.debug("Total projects: {}", projects.size());
                 }
             } else {
-                log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
+                log.error("An error occurred while getting project list. Aconex API response: {}", response.getStatusLine());
             }
         }
 
@@ -80,7 +85,7 @@ public class ProjectClient {
         int totalResults = 0;
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     XmlMapper xmlMapper = new XmlMapper();
@@ -90,7 +95,7 @@ public class ProjectClient {
                     log.debug("Total results in project: {}", totalResults);
                 }
             } else {
-                log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
+                log.error("An error occurred while getting project list. Aconex API response: {}", response.getStatusLine());
             }
         }
 

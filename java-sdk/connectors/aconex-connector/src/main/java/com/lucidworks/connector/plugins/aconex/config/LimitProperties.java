@@ -23,21 +23,21 @@ public interface LimitProperties extends Model {
             title = "Maximum Items",
             description = "Maximum number of documents to fetch. The default (-1) means no limit.",
             order = 1)
-    @NumberSchema(defaultValue = -1)
+    @NumberSchema(defaultValue = -1, minimum = -1)
     Integer maxItems();
 
     @Property(
             title = "Minimum File Size (bytes)",
             description = "Used for excluding items when the item size is smaller than the configured value. The default (-1) means no limit.",
             order = 2)
-    @NumberSchema(defaultValue = 1)
+    @NumberSchema(defaultValue = -1, minimum = -1)
     Integer minSizeBytes();
 
     @Property(
             title = "Maximum File Size (bytes)",
             description = "Used for excluding items when the item size is larger than the configured value. The default (-1) means no limit.",
             order = 3)
-    @NumberSchema(defaultValue = -1)
+    @NumberSchema(defaultValue = -1, minimum = -1)
     Integer maxSizeBytes();
 
     @Property(
@@ -52,7 +52,7 @@ public interface LimitProperties extends Model {
             title = "Document Character Limit",
             description = "To receive the full text of the document use -1",
             order = 5)
-    @NumberSchema(defaultValue = -1)
+    @NumberSchema(defaultValue = -1, minimum = -1)
     int write();
 
     @Property(
