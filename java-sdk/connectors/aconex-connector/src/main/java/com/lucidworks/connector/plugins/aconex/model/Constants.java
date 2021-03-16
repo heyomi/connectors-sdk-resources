@@ -25,7 +25,7 @@ public class Constants {
     public static final String RETURN_FIELDS = "approved,asBuiltRequired,attribute1,attribute2,attribute3,attribute4,author,authorisedBy,category,check1,check2," +
             "comments,comments2,confidential,contractDeliverable,contractnumber,contractordocumentnumber,contractorrev,current,date1,date2,discipline,docno,doctype," +
             "filename,fileSize,fileType,forreview,markupLastModifiedDate,milestonedate,numberOfMarkups,packagenumber,percentComplete,plannedsubmissiondate,printSize," +
-            "projectField1,projectField2,projectField3,received,reference,registered,reviewed,reviewSource,reviewstatus,revision,revisiondate,scale,statusid," +
+            "projectField1,projectField2,projectField3,received,reference,registered,reviewed,reviewSource,reviewstatus,revision,revisiondate,scale,statusid,trackingid," +
             "tagNumber,title,toclient,vdrcode,vendordocumentnumber,vendorrev,selectlist1,selectlist2,selectlist3,selectlist4,selectlist5,selectlist6,selectlist7,selectlist8,selectlist9";
 
     public static final int TIMEOUT_MS = 10000;

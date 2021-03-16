@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.function.Supplier;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
@@ -38,6 +37,8 @@ public class Document {
     private Date dateModified;
     @JacksonXmlProperty(localName = "Discipline")
     private String discipline;
+    @JacksonXmlProperty(localName = "TrackingId")
+    private String trackingId;
     @JacksonXmlProperty(localName = "SelectList1")
     private String select1;
     @JacksonXmlProperty(localName = "SelectList2")
@@ -61,11 +62,7 @@ public class Document {
     private long lastUpdated;
     private InputStream content;
 
-    public void setUrl(String projectId) {
-        this.url = RestApiUriBuilder.buildDocumentViewerUri(projectId, id);
-    }
-
-    public Supplier<InputStream> getContent() {
-        return () -> content;
+    public void setUrl(String host, String projectId) {
+        this.url = RestApiUriBuilder.buildDocumentViewerUri(host, projectId, this.trackingId);
     }
 }

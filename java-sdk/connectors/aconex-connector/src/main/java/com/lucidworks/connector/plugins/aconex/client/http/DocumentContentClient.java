@@ -44,6 +44,7 @@ public class DocumentContentClient {
             log.error("An error occurred while getting document:{}/{}. Aconex API response: {}", projectId, documentId, response.getStatusLine());
         }
 
+        // ConnectionPoolTimeoutException: Timeout waiting for connection from pool
         return new ByteArrayInputStream(null);
     }
 }

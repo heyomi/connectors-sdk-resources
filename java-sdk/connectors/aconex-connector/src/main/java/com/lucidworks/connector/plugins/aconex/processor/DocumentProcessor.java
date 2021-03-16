@@ -67,26 +67,10 @@ public class DocumentProcessor {
                                         m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
                                     }).emit(); */
 
-                            context.newDocument(d.getUrl())
-                                    .fields(f -> {
-                                        // Create method that does this?
-                                        f.setString("title", d.getTitle());
-                                        f.setString("category", d.getCategory());
-                                        f.setString("discipline", d.getDiscipline());
-                                        f.setString("document_id", d.getId());
-                                        f.setString("document_type", d.getDocumentType());
-                                        f.setString("document_type", d.getDocumentType());
-                                        f.setString("project_id", p.getProjectID());
-                                        f.setString("project_name", p.getProjectName());
-                                        f.setString("file_name", d.getFilename());
-                                        f.setString("file_type", d.getFileType());
-                                        f.setInteger("file_size", d.getFileSize());
-                                        f.setString("url", d.getUrl());
-                                        f.setLong("dateModified", d.getDateModified().getTime());
-                                        f.setDate("dateModified", d.getDateModified());
-                                        f.setString("select_list2", d.getSelect2());
-                                        f.setString("select_list8", d.getSelect8());
-                                        f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
+                            context.newCandidate(d.getUrl())
+                                    .metadata(m -> {
+                                        m.setString("_aconex_title", d.getTitle());
+                                        m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
                                     })
                                     .emit();
                             i++;
@@ -124,12 +108,36 @@ public class DocumentProcessor {
                     } else {
                         // get documents
                         List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
-                        // add document metadata
+                        // add document content
                         for (Document d : documents) {
                             if (i >= maxItems) break; // SP-62: Create a better way to handle this.
-                            // d.setContent(service.getDocument(p.getProjectID(), d.getId()));
-
-                            context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId())).emit();
+                            context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId()))
+                                    .fields(f -> {
+                                        // Create method that does this?
+                                        f.setString("_aconex_title", d.getTitle());
+                                        f.setBoolean("confidential", d.isConfidential());
+                                        f.setString("category", d.getCategory());
+                                        f.setString("package", d.getCategory());
+                                        f.setString("discipline", d.getDiscipline());
+                                        f.setString("project_code", d.getDiscipline());
+                                        f.setString("document_id", d.getId());
+                                        f.setString("document_type", d.getDocumentType());
+                                        f.setString("document_status", d.getDocumentStatus());
+                                        f.setString("project_id", p.getProjectID());
+                                        f.setString("project_name", p.getProjectName());
+                                        f.setString("file_name", d.getFilename());
+                                        f.setString("file_type", d.getFileType());
+                                        f.setInteger("file_size", d.getFileSize());
+                                        f.setString("url", d.getUrl());
+                                        f.setLong("dateModified", d.getDateModified().getTime());
+                                        f.setDate("dateModified", d.getDateModified());
+                                        f.setString("select_list2", d.getSelect2());
+                                        f.setString("functional_area", d.getSelect2());
+                                        f.setString("select_list8", d.getSelect8());
+                                        f.setString("related_provider", d.getSelect8());
+                                        f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
+                                    })
+                                    .emit();
                             i++;
                         }
                         pageNumber++;
