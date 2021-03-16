@@ -8,11 +8,9 @@ import com.lucidworks.fusion.connector.plugin.api.fetcher.type.content.ContentFe
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.LAST_JOB_RUN_DATE_TIME;
 
@@ -129,7 +127,9 @@ public class DocumentProcessor {
                         // add document metadata
                         for (Document d : documents) {
                             if (i >= maxItems) break; // SP-62: Create a better way to handle this.
-                            context.newContent(d.getUrl(), (Supplier<InputStream>) service.getDocument(p.getProjectID(), d.getId())).emit();
+                            // d.setContent(service.getDocument(p.getProjectID(), d.getId()));
+
+                            context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId())).emit();
                             i++;
                         }
                         pageNumber++;

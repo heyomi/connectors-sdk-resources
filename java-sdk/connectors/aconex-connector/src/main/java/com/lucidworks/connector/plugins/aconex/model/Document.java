@@ -4,15 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.InputStream;
 import java.util.Date;
+import java.util.function.Supplier;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
+@Data
 public class Document {
     @JacksonXmlProperty(localName = "DocumentId")
     private String id;
@@ -57,8 +59,13 @@ public class Document {
 
     private String url;
     private long lastUpdated;
+    private InputStream content;
 
     public void setUrl(String projectId) {
         this.url = RestApiUriBuilder.buildDocumentViewerUri(projectId, id);
+    }
+
+    public Supplier<InputStream> getContent() {
+        return () -> content;
     }
 }

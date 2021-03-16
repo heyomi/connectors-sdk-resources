@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 public class AconexService implements AconexClient {
@@ -37,7 +38,8 @@ public class AconexService implements AconexClient {
     }
 
     @Override
-    public InputStream getDocument(String projectId, String documentId) throws IOException {
-        return documentClient.getDocumentContent(projectId, documentId);
+    public Supplier<InputStream> getDocument(String projectId, String documentId) throws IOException {
+        final InputStream in = documentClient.getDocumentContent(projectId, documentId);
+        return () -> in ;
     }
 }
