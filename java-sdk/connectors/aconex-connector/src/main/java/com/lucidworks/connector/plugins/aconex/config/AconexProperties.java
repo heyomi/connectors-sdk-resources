@@ -8,9 +8,9 @@ public interface AconexProperties extends Model {
 
     @Property(
             title = "Aconex Instance Options",
-            description = "Options for configuring project retrieval.",
+            // description = "Options for configuring project retrieval.",
             order = 1,
-            hints = { UIHints.ADVANCED }
+            required = true
     )
     ApiProperties api();
 

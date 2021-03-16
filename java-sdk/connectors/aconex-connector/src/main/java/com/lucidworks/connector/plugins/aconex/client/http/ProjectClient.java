@@ -52,7 +52,7 @@ public class ProjectClient {
 
                     List<String> projectNames = config.properties().project().projects();
 
-                    if (CollectionUtils.isNotEmpty(projects)) {
+                    if (CollectionUtils.isNotEmpty(projectNames)) {
                         log.info("Project Filter: {}", projectNames);
                         projects.removeIf(p -> !projectNames.contains(p.getProjectName()));
                     }

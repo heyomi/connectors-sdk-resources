@@ -54,7 +54,7 @@ public class DocumentProcessor {
                             context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId()))
                                     .fields(f -> {
                                         // Create method that does this?
-                                        f.setString("_aconex_title", d.getTitle());
+                                        f.setString("_aconex_title_t", d.getTitle());
                                         f.setBoolean("confidential", d.isConfidential());
                                         f.setString("category", d.getCategory());
                                         f.setString("package", d.getCategory());
