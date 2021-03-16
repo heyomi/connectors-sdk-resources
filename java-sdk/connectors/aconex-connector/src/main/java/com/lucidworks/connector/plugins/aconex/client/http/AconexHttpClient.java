@@ -60,7 +60,7 @@ public class AconexHttpClient {
                 log.warn("An error occurred while getting project list. Aconex API response: {}", response.statusCode());
             } else {
                 projectList = new Gson().fromJson(response.body(), ProjectList.class);
-                log.info("Total projects found: {}", projectList.getSearchResults().size());
+                log.debug("Total projects found: {}", projectList.getSearchResults().size());
             }
         } catch (IOException e) {
             log.error("An error occurred while getting project list", e);
@@ -77,7 +77,7 @@ public class AconexHttpClient {
     }
 
     public String getDocuments(@NonNull String projectId, int pageNumber, int pageSize) {
-        log.info("Getting documents in project: {}/{}", projectId, pageNumber);
+        log.debug("Getting documents in project: {}/{}", projectId, pageNumber);
 
         String documents = null;
         if (pageNumber < 1) pageNumber = DEFAULT_PAGE_NUMBER;

@@ -28,6 +28,9 @@ class ProjectClientTest {
     AuthenticationConfig.BasicAuthenticationProperties authProps;
 
     @Mock
+    ApiProperties apiProperties;
+
+    @Mock
     LimitProperties limitProperties;
 
     @Mock
@@ -50,6 +53,8 @@ class ProjectClientTest {
         MockitoAnnotations.initMocks(this);
 
         when(authConfig.basic()).thenReturn(authProps);
+        when(apiProperties.host()).thenReturn("https://uk1.aconex.co.uk");
+        when(apiProperties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
         when(timeoutProps.connection()).thenReturn(30000);
         when(limitProperties.pageSize()).thenReturn(25);
         when(limitProperties.pageSize()).thenReturn(25);
@@ -59,8 +64,7 @@ class ProjectClientTest {
         when(properties.timeout()).thenReturn(timeoutProps);
         when(properties.limit()).thenReturn(limitProperties);
         when(properties.project()).thenReturn(projectProperties);
-        when(properties.host()).thenReturn("https://uk1.aconex.co.uk");
-        when(properties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
+        when(properties.api()).thenReturn(apiProperties);
         when(config.properties()).thenReturn(properties);
     }
 
@@ -82,6 +86,6 @@ class ProjectClientTest {
 
         List<Project> projects = client.getProjects();
 
-        assertNull(projects);
+        assertTrue(projects.isEmpty());
     }
 }

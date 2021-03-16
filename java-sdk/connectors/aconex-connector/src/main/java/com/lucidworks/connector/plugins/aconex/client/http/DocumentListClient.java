@@ -36,15 +36,14 @@ public class DocumentListClient {
     }
 
     public List<Document> getDocuments(String projectId, int pageNumber) throws IOException {
-        log.info("Getting documents {}:{}", projectId, pageNumber);
+        log.debug("Getting documents {}:{}", projectId, pageNumber);
 
         List<Document> documents = new ArrayList<>();
-
         int maxItems = config.properties().limit().maxItems();
+        URI uri = RestApiUriBuilder.buildDocumentsUri(config.properties().api().host(), projectId, pageNumber, config.properties().limit().pageSize(), config.properties().project().documentReturnFields());
 
-        URI uri = RestApiUriBuilder.buildDocumentsUri(config.properties().host(), projectId, pageNumber, config.properties().limit().pageSize(), config.properties().project().documentReturnFields());
         if (maxItems > 0 && maxItems <= 500) { // 500 is the max for a single Aconex request
-            uri = RestApiUriBuilder.buildLimitedDocumentsUri(config.properties().host(), projectId, maxItems, config.properties().project().documentReturnFields());
+            uri = RestApiUriBuilder.buildLimitedDocumentsUri(config.properties().api().host(), projectId, maxItems, config.properties().project().documentReturnFields());
         }
 
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
@@ -54,14 +53,14 @@ public class DocumentListClient {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     documents = getDocumentsFromXMLResponse(EntityUtils.toString(entity));
-                    documents.forEach(d -> d.setUrl(config.properties().host(), projectId));
+                    documents.forEach(d -> d.setUrl(config.properties().api().host(), projectId));
                 }
             } else {
                 log.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response != null ? response.getStatusLine() : null);
             }
         }
 
-        log.info("{} documents processed", documents.size());
+        log.debug("{} documents processed", documents.size());
 
         return documents;
     }
@@ -76,7 +75,7 @@ public class DocumentListClient {
             if (result == null || result.getDocuments() == null) {
                 log.warn("Document search results empty for project.");
             } else {
-                log.info("{} documents found", result.getDocuments().size());
+                log.debug("{} documents found", result.getDocuments().size());
                 setTotalPages(registerSearch.getTotalPages());
                 documents = applyDocumentFilter(result.getDocuments());
             }
@@ -96,26 +95,26 @@ public class DocumentListClient {
         int minFileSize = config.properties().limit().minSizeBytes();
 
         if (CollectionUtils.isNotEmpty(includedFileExtensions)) {
-            log.info("Applying included file type {} document filter", includedFileExtensions);
+            log.debug("Applying included file type {} document filter", includedFileExtensions);
             documents.removeIf(doc -> !includedFileExtensions.contains(doc.getFileType()));
         } else if (CollectionUtils.isNotEmpty(excludedFileExtensions)) {
-            log.info("Applying excluded file type {} document filter", excludedFileExtensions);
+            log.debug("Applying excluded file type {} document filter", excludedFileExtensions);
             documents.removeIf(doc -> excludedFileExtensions.contains(doc.getFileType()));
         }
         
         if (excludeEmptyDocument) {
             //SP-57: 1348828088672012186 1348828088682002271
-            log.info("Applying excluded empty file type {} document filter", excludedFileExtensions);
+            log.debug("Applying excluded empty file type {} document filter", excludedFileExtensions);
             documents.removeIf(doc -> doc.getFileSize() <= 0);
         }
 
         if (maxFileSize > 0) {
-            log.info("Applying max file size {} document filter", maxFileSize);
+            log.debug("Applying max file size {} document filter", maxFileSize);
             documents.removeIf(doc -> doc.getFileSize() > maxFileSize);
         }
 
         if (minFileSize > 0) {
-            log.info("Applying min file size {} document filter", minFileSize);
+            log.debug("Applying min file size {} document filter", minFileSize);
             documents.removeIf(doc -> doc.getFileSize() < minFileSize);
         }
 

@@ -76,7 +76,7 @@ public class ImapConfigTest {
     ImapConfig config = ModelGenerator.generate(ImapConfig.class, data);
     assertEquals(
         host,
-        config.properties().host());
+        config.properties().api().host());
     assertEquals(
         username,
         config.properties().username());

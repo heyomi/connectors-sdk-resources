@@ -98,7 +98,7 @@ public class RestApiUriBuilder {
         return "https://app35.qa.acx/ViewDoc?docid=" + documentId + "&projectid=" + projectId;
     }
 
-    public static String buildDocumentViewerUri(@NonNull String host, @NonNull String projectId, @NonNull String documentId) {
-        return host + "/ViewDoc?cversion=1&tab=0&trackingid=" + documentId + "&projectid=" + projectId;
+    public static String buildDocumentViewerUri(@NonNull String host, @NonNull String projectId, @NonNull String trackingId) {
+        return host + "/ViewDoc?cversion=1&tab=0&trackingid=" + trackingId + "&projectid=" + projectId;
     }
 }

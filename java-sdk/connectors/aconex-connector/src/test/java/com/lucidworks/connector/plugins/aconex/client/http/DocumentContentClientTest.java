@@ -14,8 +14,7 @@ import org.mockito.Spy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class DocumentContentClientTest {
@@ -27,6 +26,9 @@ class DocumentContentClientTest {
 
     @Mock
     AuthenticationConfig.BasicAuthenticationProperties authProps;
+
+    @Mock
+    ApiProperties apiProperties;
 
     @Mock
     LimitProperties limitProperties;
@@ -52,6 +54,8 @@ class DocumentContentClientTest {
 
         when(authProps.username()).thenReturn("Omar McKenzie");
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
+        when(apiProperties.host()).thenReturn("https://uk1.aconex.co.uk");
+        when(apiProperties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
         when(authConfig.basic()).thenReturn(authProps);
         when(timeoutProps.connection()).thenReturn(30000);
         when(limitProperties.pageSize()).thenReturn(25);
@@ -63,8 +67,7 @@ class DocumentContentClientTest {
         when(properties.limit()).thenReturn(limitProperties);
         when(projectProperties.documentReturnFields()).thenReturn(Constants.DEFAULT_RETURN_FIELDS);
         when(properties.project()).thenReturn(projectProperties);
-        when(properties.host()).thenReturn("https://uk1.aconex.co.uk");
-        when(properties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
+        when(properties.api()).thenReturn(apiProperties);
         when(config.properties()).thenReturn(properties);
     }
 
@@ -79,6 +82,6 @@ class DocumentContentClientTest {
     void shouldReturnDocumentContentWhenRequestInvalid() throws IOException {
         InputStream in = client.getDocumentContent("268447644", "0123456789");
 
-        assertNull(in);
+        assertEquals(0, in.readAllBytes().length);
     }
 }

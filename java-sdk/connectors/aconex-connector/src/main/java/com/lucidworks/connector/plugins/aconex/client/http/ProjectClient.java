@@ -8,6 +8,7 @@ import com.lucidworks.connector.plugins.aconex.model.Project;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -35,7 +36,7 @@ public class ProjectClient {
 
     public List<Project> getProjects() throws IOException {
         ProjectList projectList;
-        URI uri = RestApiUriBuilder.buildProjectsUri(config.properties().host());
+        URI uri = RestApiUriBuilder.buildProjectsUri(config.properties().api().host());
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
         List<Project> projects = new ArrayList<>();
 
@@ -49,6 +50,13 @@ public class ProjectClient {
                     projectList = new Gson().fromJson(EntityUtils.toString(entity), ProjectList.class);
                     projects = projectList.getSearchResults();
 
+                    List<String> projectNames = config.properties().project().projects();
+
+                    if (CollectionUtils.isNotEmpty(projects)) {
+                        log.info("Project Filter: {}", projectNames);
+                        projects.removeIf(p -> !projectNames.contains(p.getProjectName()));
+                    }
+
                     for (Project p : projects) {
                         int totalResults = getTotalResults(p.getProjectID());
                         int pages = getTotalPages(totalResults, config.properties().limit().pageSize());
@@ -56,7 +64,7 @@ public class ProjectClient {
                         p.setTotalPages(pages);
                     }
 
-                    log.info("Total projects: {}", projects.size());
+                    log.debug("Total projects: {}", projects.size());
                 }
             } else {
                 log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);
@@ -67,7 +75,7 @@ public class ProjectClient {
     }
 
     private int getTotalResults(String projectId) throws IOException {
-        URI uri = RestApiUriBuilder.buildCountDocumentsUri(config.properties().host(), projectId);
+        URI uri = RestApiUriBuilder.buildCountDocumentsUri(config.properties().api().host(), projectId);
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
         int totalResults = 0;
 
@@ -79,7 +87,7 @@ public class ProjectClient {
                     RegisterSearch registerSearch = xmlMapper.readValue(EntityUtils.toString(entity), RegisterSearch.class);
                     totalResults = registerSearch.getTotalResults();
 
-                    log.info("Total results in project: {}", totalResults);
+                    log.debug("Total results in project: {}", totalResults);
                 }
             } else {
                 log.error("An error occurred while getting project list. Aconex API response: {}", response != null ? response.getStatusLine() : null);

@@ -32,7 +32,7 @@ public class HttpClientHelper {
         HttpGet request = new HttpGet(uri);
 
         // add request headers
-        request.addHeader(HTTP_HEADER_APPLICATION_KEY, config.properties().apiKey());
+        request.addHeader(HTTP_HEADER_APPLICATION_KEY, config.properties().api().apiKey());
         request.addHeader(HttpHeaders.AUTHORIZATION, HttpClientHelper.getEncodedAuth(config.properties().auth().basic().username(), config.properties().auth().basic().password()));
 
         RequestConfig requestConfig = RequestConfig.custom()

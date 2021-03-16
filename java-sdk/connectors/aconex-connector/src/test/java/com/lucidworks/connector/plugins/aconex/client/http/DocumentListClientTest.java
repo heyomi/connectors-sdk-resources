@@ -29,6 +29,9 @@ class DocumentListClientTest {
     AuthenticationConfig.BasicAuthenticationProperties authProps;
 
     @Mock
+    ApiProperties apiProperties;
+
+    @Mock
     LimitProperties limitProperties;
 
     @Mock
@@ -52,10 +55,12 @@ class DocumentListClientTest {
 
         when(authProps.username()).thenReturn("Omar McKenzie");
         when(authProps.password()).thenReturn("F$/K#;E@dB32*yt:");
+        when(apiProperties.host()).thenReturn("https://uk1.aconex.co.uk");
+        when(apiProperties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
         when(authConfig.basic()).thenReturn(authProps);
         when(timeoutProps.connection()).thenReturn(30000);
-        when(limitProperties.maxItems()).thenReturn(100);
-        when(limitProperties.pageSize()).thenReturn(100);
+        when(limitProperties.maxItems()).thenReturn(25);
+        when(limitProperties.pageSize()).thenReturn(25);
         when(limitProperties.excludeEmptyDocuments()).thenReturn(true);
         when(limitProperties.write()).thenReturn(-1);
         when(properties.auth()).thenReturn(authConfig);
@@ -63,8 +68,7 @@ class DocumentListClientTest {
         when(properties.limit()).thenReturn(limitProperties);
         when(projectProperties.documentReturnFields()).thenReturn(Constants.RETURN_FIELDS);
         when(properties.project()).thenReturn(projectProperties);
-        when(properties.host()).thenReturn("https://uk1.aconex.co.uk");
-        when(properties.apiKey()).thenReturn("0e906a26-836c-4ca5-943b-9af74a4f0159");
+        when(properties.api()).thenReturn(apiProperties);
         when(config.properties()).thenReturn(properties);
     }
 
@@ -78,7 +82,7 @@ class DocumentListClientTest {
 
     @Test
     void shouldReturnDocumentsWhenEmptyFile() throws IOException {
-        when(limitProperties.includeMetadata()).thenReturn(true);
+        when(limitProperties.excludeEmptyDocuments()).thenReturn(true);
 
         List<Document> documents = client.getDocuments("268447644", 1);
 

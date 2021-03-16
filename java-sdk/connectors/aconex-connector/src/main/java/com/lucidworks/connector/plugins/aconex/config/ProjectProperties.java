@@ -1,7 +1,8 @@
 package com.lucidworks.connector.plugins.aconex.config;
 
 import com.lucidworks.fusion.schema.Model;
-import com.lucidworks.fusion.schema.SchemaAnnotations;
+import com.lucidworks.fusion.schema.SchemaAnnotations.ArraySchema;
+import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import com.lucidworks.fusion.schema.UIHints;
 
@@ -16,8 +17,8 @@ public interface ProjectProperties extends Model {
             order = 1,
             hints = { UIHints.ADVANCED }
     )
-    @SchemaAnnotations.ArraySchema(defaultValue = "[]")
-    @SchemaAnnotations.StringSchema(minLength = 1)
+    @ArraySchema(defaultValue = "[]")
+    @StringSchema(minLength = 1)
     List<String> projects();
 
     @Property(
@@ -27,6 +28,6 @@ public interface ProjectProperties extends Model {
             order = 2,
             hints = { UIHints.ADVANCED }
     )
-    @SchemaAnnotations.StringSchema(minLength = 1, defaultValue = RETURN_FIELDS)
+    @StringSchema(minLength = 1, defaultValue = RETURN_FIELDS)
     String documentReturnFields();
 }

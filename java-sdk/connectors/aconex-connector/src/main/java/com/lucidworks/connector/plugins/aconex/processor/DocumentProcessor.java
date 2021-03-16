@@ -10,28 +10,23 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.LAST_JOB_RUN_DATE_TIME;
 
 @Slf4j
 public class DocumentProcessor {
-
     private final ContentFetcher.FetchContext context;
     private final AconexConfig config;
     private final AconexClient service;
-    private long lastJobRunDateTime;
-    private Map<String, Object> metaData;
 
-    public DocumentProcessor(ContentFetcher.FetchContext context, AconexConfig config, AconexClient service, long lastJobRunDateTime) {
+    public DocumentProcessor(ContentFetcher.FetchContext context, AconexConfig config, AconexClient service) {
         this.context = context;
         this.config = config;
         this.service = service;
-        this.lastJobRunDateTime = lastJobRunDateTime;
     }
 
     public void process() {
-        log.trace("Starting Job:{}", context.getJobRunInfo().getId());
+        log.info("Starting New Content Phase in Job:{}", context.getJobRunInfo().getId());
 
         int totalPages;
         int pageNumber = 1;
@@ -43,67 +38,12 @@ public class DocumentProcessor {
             final List<Project> projects = service.getProjects();
 
             for (Project p : projects) {
-                log.info("Starting on project:{}", p.getProjectID());
+                log.debug("Starting on project:{}", p.getProjectID());
 
                 totalPages = p.getTotalPages();
                 while(pageNumber <= totalPages) {
                     if (maxItems >= 0 && i >= maxItems) { // SP-62: Create a better way to handle this.
-                        log.info("Max item limit reached");
-                        break;
-                    } else {
-                        // get documents
-                        List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
-                        // add document metadata
-                        for (Document d : documents) {
-
-                            if (i >= maxItems) break; // SP-62: Create a better way to handle this.
-
-                            /* context.newCandidate(d.getId())
-                                    .metadata(m -> {
-                                        m.setString("title", d.getTitle());
-                                        // add last time when entry was modified
-                                        m.setLong(ENTRY_LAST_UPDATED, Instant.now().toEpochMilli());
-                                        // add 'lastJobRunDateTime'.
-                                        m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
-                                    }).emit(); */
-
-                            context.newCandidate(d.getUrl())
-                                    .metadata(m -> {
-                                        m.setString("_aconex_title", d.getTitle());
-                                        m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
-                                    })
-                                    .emit();
-                            i++;
-                        }
-                        pageNumber++;
-                    }
-                    log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
-                }
-
-            }
-
-            createNewContent(projects);
-        } catch (IOException e) {
-            log.error("An error occurred", e);
-        }
-    }
-
-    private void createNewContent(List<Project> projects) {
-        log.info("Starting New Content Phase in Job:{}", context.getJobRunInfo().getId());
-
-        int totalPages;
-        int pageNumber = 1;
-        long i = 0;
-        int maxItems = config.properties().limit().maxItems();
-
-        try {
-            for (Project p : projects) {
-                log.info("Starting on project:{}", p.getProjectID());
-
-                totalPages = p.getTotalPages();
-                while(pageNumber <= totalPages) {
-                    if (maxItems >= 0 && i >= maxItems) { // SP-62: Create a better way to handle this.
-                        log.info("Max item limit reached");
+                        log.debug("Max item limit reached");
                         break;
                     } else {
                         // get documents
@@ -137,12 +77,13 @@ public class DocumentProcessor {
                                         f.setString("related_provider", d.getSelect8());
                                         f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
                                     })
+                                    .metadata(m -> m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli()))
                                     .emit();
                             i++;
                         }
                         pageNumber++;
                     }
-                    log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
+                    log.debug("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
                 }
 
             }

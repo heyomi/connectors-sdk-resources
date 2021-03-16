@@ -10,13 +10,7 @@ import lombok.NoArgsConstructor;
 public class AconexHttpClientOptions {
     private String hostname;
     private String apiKey;
-    private AuthType authType;
     private String username;
     private String password;
     private int connectionTimeout;
-
-    public enum AuthType {
-        BASIC,
-        API
-    }
 }

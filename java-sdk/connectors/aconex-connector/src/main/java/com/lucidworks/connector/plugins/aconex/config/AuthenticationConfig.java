@@ -7,8 +7,8 @@ import com.lucidworks.fusion.schema.UIHints;
 
 public interface AuthenticationConfig extends Model {
     @Property(
-            title = "Basic Authentication",
-            description = "Settings for the Basic Auth.",
+            // title = "Basic Authentication",
+            // description = "Settings for the Basic Auth.",
             required = true,
             order = 2
     )

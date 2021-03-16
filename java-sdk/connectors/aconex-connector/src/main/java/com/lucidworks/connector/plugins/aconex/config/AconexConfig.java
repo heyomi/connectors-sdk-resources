@@ -6,7 +6,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import com.lucidworks.fusion.schema.SchemaAnnotations.RootSchema;
 
 @RootSchema(
-        title = "Aconex Connector - DEV",
+        title = "Aconex Connector",
         description = "A simple Aconex connector",
         category = "Aconex"
 )
