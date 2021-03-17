@@ -1,5 +1,8 @@
 package com.lucidworks.connector.plugins.aconex.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
     public static final String API = "api";
     public static final String PROJECTS = "projects";
@@ -30,7 +33,7 @@ public class Constants {
 
     public static final int TIMEOUT_MS = 10000;
     public static final String IGNORED_FILE_TYPES = "jpg,jpeg,png,gif,zip";
-    public static final String DOC_FILE_TYPE = "pdf,doc,txt,xls";
+    public static final List<String> DOC_FILE_TYPE = Arrays.asList("pdf", "doc", "txt", "xls");
 
     public static final String CHECKPOINT_PREFIX = "checkpoint_prefix";
     public static final String TOTAL_INDEXED = "total_indexed";

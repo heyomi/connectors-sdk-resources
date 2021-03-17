@@ -61,6 +61,7 @@ class DocumentListClientTest {
         when(timeoutProps.connection()).thenReturn(30000);
         when(limitProperties.maxItems()).thenReturn(25);
         when(limitProperties.pageSize()).thenReturn(25);
+        when(limitProperties.includeMetadata()).thenReturn(true);
         when(limitProperties.excludeEmptyDocuments()).thenReturn(true);
         when(limitProperties.write()).thenReturn(-1);
         when(properties.auth()).thenReturn(authConfig);
@@ -116,5 +117,15 @@ class DocumentListClientTest {
 
         assertNotNull(documents);
         assertTrue(documents.isEmpty());
+    }
+
+    @Test
+    void shouldReturnDocumentsWhenMetadataIsFalse() throws IOException {
+        when(limitProperties.includeMetadata()).thenReturn(false);
+
+        List<Document> documents = client.getDocuments("268447644", 1);
+
+        assertNotNull(documents);
+        assertTrue(documents.size() < 25);
     }
 }

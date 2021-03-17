@@ -44,10 +44,13 @@ public class DocumentProcessor {
                 while (pageNumber <= totalPages) {
                     // get documents
                     List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
+                    log.info("docs: {}", documents.size());
 
                     // add document content
                     for (Document d : documents) {
                         if (maxItems > -1 && i >= maxItems) break; // SP-62: Create a better way to handle this.
+
+                        log.info("id: {}", d.getId());
                         context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId(), d.isDocument()))
                                 .fields(f -> {
                                     f.merge(d.toMetadata());
@@ -59,9 +62,9 @@ public class DocumentProcessor {
                                 .emit();
                         i++;
                     }
+                    log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
                     pageNumber++;
                 }
-                log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
             }
         } catch (IOException e) {
             log.error("An error occurred", e);

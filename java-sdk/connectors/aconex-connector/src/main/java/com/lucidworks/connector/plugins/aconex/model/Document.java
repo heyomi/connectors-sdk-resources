@@ -97,6 +97,6 @@ public class Document {
     }
 
     public void setDocument() {
-        isDocument = (fileType != null && DOC_FILE_TYPE.contains(fileType));
+        isDocument = fileType != null && DOC_FILE_TYPE.contains(fileType.toLowerCase());
     }
 }
