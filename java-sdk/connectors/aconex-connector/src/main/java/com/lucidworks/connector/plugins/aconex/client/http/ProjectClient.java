@@ -7,6 +7,7 @@ import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Project;
 import com.lucidworks.connector.plugins.aconex.model.ProjectList;
 import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
@@ -19,7 +20,6 @@ import org.apache.http.util.EntityUtils;
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +39,14 @@ public class ProjectClient {
         this.config = config;
     }
 
-    public List<Project> getProjects() throws IOException {
+    @SneakyThrows
+    public List<Project> getProjects() {
         ProjectList projectList;
         URI uri = RestApiUriBuilder.buildProjectsUri(config.properties().api().host());
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
         List<Project> projects = new ArrayList<>();
 
-        // project endpoint accepts JSON
+        // The Aconex API Project endpoint accepts JSON
         request.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -55,8 +56,8 @@ public class ProjectClient {
                     projectList = new Gson().fromJson(EntityUtils.toString(entity), ProjectList.class);
                     projects = projectList.getSearchResults();
 
+                    // Apply Project Filter by Name
                     List<String> projectNames = config.properties().project().projects();
-
                     if (CollectionUtils.isNotEmpty(projectNames)) {
                         log.info("Project Filter: {}", projectNames);
                         projects.removeIf(p -> !projectNames.contains(p.getProjectName()));
@@ -79,7 +80,8 @@ public class ProjectClient {
         return projects;
     }
 
-    private int getTotalResults(String projectId) throws IOException {
+    @SneakyThrows
+    private int getTotalResults(String projectId) {
         URI uri = RestApiUriBuilder.buildCountDocumentsUri(config.properties().api().host(), projectId);
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
         int totalResults = 0;

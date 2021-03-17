@@ -11,6 +11,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import java.util.Set;
 
 import static com.lucidworks.connector.plugins.aconex.model.Constants.DEFAULT_PAGE_SIZE;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.DOC_FILE_TYPE;
 
 /**
  * An extension interface for any {@link ConnectorPluginProperties} implementation.
@@ -57,22 +58,23 @@ public interface LimitProperties extends Model {
 
     @Property(
             title = "Index Document Metadata",
-            description = "Index the document's metadata for those files/attachments that meet the maximum/minimum size limits.",
+            description = "Index the document's metadata for those files that do not match these types: " + DOC_FILE_TYPE,
             order = 6)
     @BooleanSchema(defaultValue = true)
     boolean includeMetadata();
 
     @Property(
             title = "Exclude Empty Documents",
-            description = "Prevents 'CANNOT_DOWNLOAD_EMPTY_DOCUMENT' error. Cannot download a registered document which does not have a backing file",
-            order = 6)
+            description = "Ignores documents with empty FileSize. Prevents 'CANNOT_DOWNLOAD_EMPTY_DOCUMENT' error. Cannot download a registered document which does not have a backing file",
+            order = 7)
     @BooleanSchema(defaultValue = true)
     boolean excludeEmptyDocuments();
 
     @Property(
             title = "Included file extensions",
-            description = "Set of file extensions to be fetched. If specified, all non-matching files will be skipped.",
-            order = 7)
+            description = "Set of file extensions to be fetched. If specified, all non-matching files will be skipped." +
+                    "This takes priority over Excluded file extensions",
+            order = 8)
     @ArraySchema(defaultValue = "[]")
     @StringSchema(minLength = 1)
     Set<String> includedFileExtensions();
@@ -80,7 +82,7 @@ public interface LimitProperties extends Model {
     @Property(
             title = "Excluded file extensions",
             description = "A set of all file extensions to be skipped from the fetch.",
-            order = 8)
+            order = 9)
     @ArraySchema(defaultValue = "[]")
     @StringSchema(minLength = 1)
     Set<String> excludedFileExtensions();

@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.lucidworks.connector.plugins.aconex.model.Constants.DOC_FILE_TYPE;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -63,10 +65,7 @@ public class Document {
     private String url;
     private long lastUpdated;
     private InputStream content;
-
-    public void setUrl(String host, String projectId) {
-        this.url = RestApiUriBuilder.buildDocumentViewerUri(host, projectId, this.trackingId);
-    }
+    private boolean isDocument;
 
     public Map<String, Object> toMetadata() {
         Map<String, Object> document = new HashMap<>();
@@ -91,5 +90,13 @@ public class Document {
         document.put("related_provider_t", getSelect8());
         
         return document;
+    }
+
+    public void setUrl(String host, String projectId) {
+        this.url = RestApiUriBuilder.buildDocumentViewerUri(host, projectId, this.trackingId);
+    }
+
+    public void setDocument() {
+        isDocument = (fileType != null && DOC_FILE_TYPE.contains(fileType));
     }
 }

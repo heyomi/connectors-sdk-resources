@@ -24,16 +24,12 @@ public class HttpClientHelper {
     private String password;
     private int connectionTimeout;
 
-    public static String getEncodedAuth(@NonNull String username, @NonNull String password) {
-        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-    }
-
     public static HttpGet createHttpRequest(@NonNull URI uri, @NonNull AconexConfig config) {
         HttpGet request = new HttpGet(uri);
 
         // add request headers
         request.addHeader(HTTP_HEADER_APPLICATION_KEY, config.properties().api().apiKey());
-        request.addHeader(HttpHeaders.AUTHORIZATION, HttpClientHelper.getEncodedAuth(config.properties().auth().basic().username(), config.properties().auth().basic().password()));
+        request.addHeader(HttpHeaders.AUTHORIZATION, encodeBasicAuth(config.properties().auth().basic().username(), config.properties().auth().basic().password()));
 
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectionRequestTimeout(config.properties().timeout().connection())
@@ -44,5 +40,9 @@ public class HttpClientHelper {
         request.setConfig(requestConfig);
 
         return request;
+    }
+
+    private static String encodeBasicAuth(@NonNull String username, @NonNull String password) {
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 }

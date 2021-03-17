@@ -14,5 +14,5 @@ public interface AconexClient {
 
     List<Document> getDocuments(String projectId, int pageNumber) throws IOException;
 
-    Supplier<InputStream> getDocument(String projectId, String documentId) throws IOException;
+    Supplier<InputStream> getDocument(String projectId, String documentId, boolean isDocument) throws IOException;
 }

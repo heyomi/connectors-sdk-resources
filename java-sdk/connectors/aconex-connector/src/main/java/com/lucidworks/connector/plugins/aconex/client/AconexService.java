@@ -8,7 +8,6 @@ import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.Project;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.function.Supplier;
@@ -28,18 +27,17 @@ public class AconexService implements AconexClient {
     }
 
     @Override
-    public List<Project> getProjects() throws IOException {
+    public List<Project> getProjects() {
         return projectClient.getProjects();
     }
 
     @Override
-    public List<Document> getDocuments(String projectId, int pageNumber) throws IOException {
+    public List<Document> getDocuments(String projectId, int pageNumber) {
         return documentListClient.getDocuments(projectId, pageNumber);
     }
 
     @Override
-    public Supplier<InputStream> getDocument(String projectId, String documentId) throws IOException {
-        final InputStream in = documentClient.getDocumentContent(projectId, documentId);
-        return () -> in ;
+    public Supplier<InputStream> getDocument(String projectId, String documentId, boolean isDocument) {
+        return () -> documentClient.getDocumentContent(projectId, documentId, isDocument) ;
     }
 }

@@ -48,7 +48,7 @@ public class DocumentProcessor {
                     // add document content
                     for (Document d : documents) {
                         if (maxItems > -1 && i >= maxItems) break; // SP-62: Create a better way to handle this.
-                        context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId()))
+                        context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId(), d.isDocument()))
                                 .fields(f -> {
                                     f.merge(d.toMetadata());
                                     f.setString("project_id_t", p.getProjectID());

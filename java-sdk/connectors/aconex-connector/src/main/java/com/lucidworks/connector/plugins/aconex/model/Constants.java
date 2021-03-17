@@ -29,7 +29,7 @@ public class Constants {
             "tagNumber,title,toclient,vdrcode,vendordocumentnumber,vendorrev,selectlist1,selectlist2,selectlist3,selectlist4,selectlist5,selectlist6,selectlist7,selectlist8,selectlist9";
 
     public static final int TIMEOUT_MS = 10000;
-    public static final String IMAGE_FILE_TYPE = "jpg,jpeg,png,gif";
+    public static final String IGNORED_FILE_TYPES = "jpg,jpeg,png,gif,zip";
     public static final String DOC_FILE_TYPE = "pdf,doc,txt,xls";
 
     public static final String CHECKPOINT_PREFIX = "checkpoint_prefix";
