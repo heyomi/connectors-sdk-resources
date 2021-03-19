@@ -42,8 +42,8 @@ public interface LimitProperties extends Model {
     Integer maxSizeBytes();
 
     @Property(
-            title = "Request Page Size",
-            description = "If specified, the value must be a number that is divisible by 25." +
+            title = "REST API Page Size",
+            description = "If specified, the value must be a number that is divisible by \"25\". If not, then 25 will used." +
                     "Without this parameter specified, this defaults to 25 Note: this parameter has a maximum value of 500",
             order = 4)
     @NumberSchema(defaultValue = DEFAULT_PAGE_SIZE, minimum = DEFAULT_PAGE_SIZE, maximum = 500)
@@ -60,8 +60,9 @@ public interface LimitProperties extends Model {
 
     @Property(
             title = "Index Document Metadata",
-            description = "Index the document's metadata for those files that do not match these types: pdf,doc,xls,txt",
-            order = 6)
+            description = "Index the document's metadata for those files that <b>do not</b> match these types: pdf,doc,xls,txt",
+            order = 6,
+            hints = { UIHints.HIDDEN })
     @BooleanSchema
     boolean includeMetadata();
 
@@ -78,15 +79,15 @@ public interface LimitProperties extends Model {
             title = "Included file extensions",
             description = "Set of file extensions (in lowercase) to be fetched. If specified, all non-matching files will be skipped." +
                     "This takes priority over Excluded file extensions",
-            order = 8)
+            order = 9)
     @ArraySchema(defaultValue = "[]")
     @StringSchema(minLength = 1)
     Set<String> includedFileExtensions();
 
     @Property(
             title = "Excluded file extensions",
-            description = "A set of all file extensions (in lowercase) to be skipped from the fetch.",
-            order = 9)
+            description = "A set of all file extensions to be skipped from the fetch.",
+            order = 10)
     @ArraySchema(defaultValue = "[]")
     @StringSchema(minLength = 1)
     Set<String> excludedFileExtensions();

@@ -4,14 +4,16 @@ import com.lucidworks.connector.plugins.aconex.client.AconexClient;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.Project;
+import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import com.lucidworks.fusion.connector.plugin.api.fetcher.type.content.ContentFetcher;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
-import static com.lucidworks.connector.plugins.aconex.model.Constants.LAST_JOB_RUN_DATE_TIME;
+import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
 @Slf4j
 public class DocumentProcessor {
@@ -25,49 +27,61 @@ public class DocumentProcessor {
         this.service = service;
     }
 
+    @SuppressWarnings("unchecked")
     public void process() {
-        log.info("Starting New Content Phase in Job:{}", context.getJobRunInfo().getId());
-
-        int totalPages;
-        int pageNumber = 1;
-        long i = 0;
+        long emitCounter = 0;
         int maxItems = config.properties().limit().maxItems();
 
         try {
             // get projects
             final List<Project> projects = service.getProjects();
 
-            for (Project p : projects) {
-                log.info("Starting on project:{}", p.getProjectID());
+            for (Project project : projects) {
+                log.info("Starting on project:{}", project.getProjectID());
 
-                totalPages = p.getTotalPages();
+                // get documents on page: 1
+                Map<String, Object> documentRegister = service.getDocumentRegister(project.getProjectID(), 1);
+                List<Document> documents = (List<Document>) documentRegister.get(DOCUMENTS);
+                RegisterSearch register = (RegisterSearch) documentRegister.get(REGISTER);
+                int totalPages = register.getTotalPages();
+                int pageNumber = 1;
+
+                log.info("Project: {}, {}", project.getProjectID(), register.toString());
+
+                // Loop through all pages. The API uses PAGED search type, meaning return results by "pages" of variable size.
+                maxItems:
                 while (pageNumber <= totalPages) {
-                    // get documents
-                    List<Document> documents = service.getDocuments(p.getProjectID(), pageNumber);
-                    log.info("docs: {}", documents.size());
+                    if (pageNumber > 1) {
+                        // Get documents on subsequent pages
+                        documents = service.getDocuments(project.getProjectID(), pageNumber);
+                    }
 
                     // add document content
-                    for (Document d : documents) {
-                        if (maxItems > -1 && i >= maxItems) break; // SP-62: Create a better way to handle this.
-
-                        log.info("id: {}", d.getId());
-                        context.newContent(d.getUrl(), service.getDocument(p.getProjectID(), d.getId(), d.isDocument()))
-                                .fields(f -> {
-                                    f.merge(d.toMetadata());
-                                    f.setString("project_id_t", p.getProjectID());
-                                    f.setString("project_name_t", p.getProjectName());
-                                    f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
-                                })
-                                .metadata(m -> m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli()))
-                                .emit();
-                        i++;
+                    for (Document document : documents) {
+                        if (maxItems > -1 && emitCounter >= maxItems) break maxItems;
+                        createDocument(project, document);
+                        emitCounter++;
                     }
-                    log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, i);
+                    log.info("Processed page:{} of {} with {} new documents", pageNumber, totalPages, emitCounter);
                     pageNumber++;
                 }
             }
-        } catch (IOException e) {
+        } catch(Exception e) {
             log.error("An error occurred", e);
+            context.newError(context.getFetchInput().getId(), e.getMessage())
+                    .emit();
         }
+    }
+
+    private void createDocument(Project project, Document document) throws IOException {
+        context.newContent(document.getUrl(), service.getDocument(project.getProjectID(), document.getId()))
+                .fields(f -> {
+                    f.merge(document.toMetadata());
+                    f.setString("project_id_t", project.getProjectID());
+                    f.setString("project_name_t", project.getProjectName());
+                    f.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli());
+                })
+                .metadata(m -> m.setLong(LAST_JOB_RUN_DATE_TIME, Instant.now().toEpochMilli()))
+                .emit();
     }
 }

@@ -6,6 +6,4 @@ import lombok.Data;
 public class Project {
     private final String projectID;
     private final String projectName;
-    private int totalPages;
-    private int totalResults;
 }

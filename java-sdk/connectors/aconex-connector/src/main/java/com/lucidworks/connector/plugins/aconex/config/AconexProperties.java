@@ -48,7 +48,7 @@ public interface AconexProperties extends Model {
             title = "Performance",
             description = "These API request limits when calling the Aconex web services.",
             order = 6,
-            hints = { UIHints.ADVANCED }
+            hints = { UIHints.HIDDEN }
     )
     PerformanceProperties performance();
 }

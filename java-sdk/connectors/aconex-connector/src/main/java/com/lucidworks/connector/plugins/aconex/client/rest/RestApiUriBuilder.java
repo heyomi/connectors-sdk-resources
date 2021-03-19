@@ -13,16 +13,6 @@ public class RestApiUriBuilder {
         return UriBuilder.fromPath(hostname).path(API).path(PROJECTS).build();
     }
 
-    public static URI buildCountDocumentsUri(@NonNull String hostname, @NonNull String projectId) {
-        return UriBuilder.fromPath(hostname)
-                .path(API)
-                .path(PROJECTS)
-                .path(projectId)
-                .path(REGISTER)
-                .queryParam(PARAM_SEARCH_TYPE, SEARCH_TYPE_COUNT)
-                .build();
-    }
-
     public static URI buildDocumentsUri(@NonNull String hostname, @NonNull String projectId) {
         return buildDocumentsUri(hostname, projectId, DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
     }
@@ -91,11 +81,6 @@ public class RestApiUriBuilder {
                 .path(documentId)
                 .path(MARKEDUP)
                 .build();
-    }
-
-    @Deprecated
-    public static String buildDocumentViewerUri(@NonNull String projectId, @NonNull String documentId) {
-        return "https://app35.qa.acx/ViewDoc?docid=" + documentId + "&projectid=" + projectId;
     }
 
     public static String buildDocumentViewerUri(@NonNull String host, @NonNull String projectId, @NonNull String trackingId) {

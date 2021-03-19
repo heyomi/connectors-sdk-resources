@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lucidworks.connector.plugins.aconex.model.Constants.DOC_FILE_TYPE;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -65,7 +63,6 @@ public class Document {
     private String url;
     private long lastUpdated;
     private InputStream content;
-    private boolean isDocument;
 
     public Map<String, Object> toMetadata() {
         Map<String, Object> document = new HashMap<>();
@@ -80,23 +77,18 @@ public class Document {
         document.put("document_status_t", getDocumentStatus());
         document.put("file_name_t", getFilename());
         document.put("file_type_t", getFileType());
+        document.put("file_format_t", getFileType());
         document.put("file_size_l", getFileSize());
         document.put("url_t", getUrl());
         document.put("dateModified_l", getDateModified().getTime());
         document.put("dateModified_dt", getDateModified());
-        document.put("select_list2_t", getSelect2());
-        document.put("functional_area_t", getSelect2());
-        document.put("select_list8_t", getSelect8());
-        document.put("related_provider_t", getSelect8());
+        document.put("functional_area_t", (getSelect2() != null) ? getSelect2() : "N/A");
+        document.put("related_provider_t", (getSelect8() != null) ? getSelect8() : "N/A");
         
         return document;
     }
 
     public void setUrl(String host, String projectId) {
         this.url = RestApiUriBuilder.buildDocumentViewerUri(host, projectId, this.trackingId);
-    }
-
-    public void setDocument() {
-        isDocument = fileType != null && DOC_FILE_TYPE.contains(fileType.toLowerCase());
     }
 }

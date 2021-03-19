@@ -6,6 +6,7 @@ import com.lucidworks.connector.plugins.aconex.model.Project;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public interface AconexClient {
@@ -14,5 +15,7 @@ public interface AconexClient {
 
     List<Document> getDocuments(String projectId, int pageNumber) throws IOException;
 
-    Supplier<InputStream> getDocument(String projectId, String documentId, boolean isDocument) throws IOException;
+    Map<String, Object> getDocumentRegister(String projectId, int pageNumber) throws IOException;
+
+    Supplier<InputStream> getDocument(String projectId, String documentId) throws IOException;
 }

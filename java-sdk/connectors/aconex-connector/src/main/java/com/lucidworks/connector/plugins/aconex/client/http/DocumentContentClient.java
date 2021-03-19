@@ -2,16 +2,17 @@ package com.lucidworks.connector.plugins.aconex.client.http;
 
 import com.lucidworks.connector.plugins.aconex.client.rest.RestApiUriBuilder;
 import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -41,8 +42,7 @@ public class DocumentContentClient {
      * @param documentId Document ID
      * @return The response is a binary stream of the file associated with the document
      */
-    @SneakyThrows
-    public InputStream getDocumentContent(String projectId, String documentId) {
+    public InputStream getDocumentContent(String projectId, String documentId) throws IOException {
         log.debug("Getting document content:{}", documentId);
 
         URI uri = RestApiUriBuilder.buildDownloadDocumentsUri(config.properties().api().host(), projectId, documentId);
@@ -53,22 +53,10 @@ public class DocumentContentClient {
             HttpEntity entity = response.getEntity();
             if (entity != null) return entity.getContent();
         } else {
-            log.error("An error occurred while getting document:{}/{}. Aconex API response: {}", projectId, documentId, response.getStatusLine());
+            log.error("{} response while getting document:{}. Error: {}", response.getStatusLine().getReasonPhrase(), documentId, EntityUtils.toString(response.getEntity()));
+            // throw new IOException(response.getStatusLine().getReasonPhrase());
         }
 
         return new ByteArrayInputStream(new byte[0]);
-    }
-
-    /**
-     * A wrapper method for {@link #getDocumentContent(String, String)}
-     *
-     * @param projectId Project ID
-     * @param documentId Document ID
-     * @param isDocument Document Type
-     * @return The response is a binary stream of the file associated with the document
-     */
-    public InputStream getDocumentContent(String projectId, String documentId, boolean isDocument) {
-        if (isDocument) return getDocumentContent(projectId, documentId);
-        else return new ByteArrayInputStream(new byte[0]);
     }
 }

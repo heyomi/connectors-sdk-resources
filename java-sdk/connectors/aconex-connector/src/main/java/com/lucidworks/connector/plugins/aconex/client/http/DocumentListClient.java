@@ -7,8 +7,9 @@ import com.lucidworks.connector.plugins.aconex.config.AconexConfig;
 import com.lucidworks.connector.plugins.aconex.model.Document;
 import com.lucidworks.connector.plugins.aconex.model.RegisterSearch;
 import com.lucidworks.connector.plugins.aconex.model.SearchResults;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
@@ -19,10 +20,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static com.lucidworks.connector.plugins.aconex.model.Constants.*;
 
 /**
  * The service executes a search of an organization's document register for a project.
@@ -33,7 +35,9 @@ import java.util.Set;
 public class DocumentListClient {
     private final CloseableHttpClient httpClient;
     private final AconexConfig config;
-    private int totalPages;
+
+    @Getter @Setter
+    private RegisterSearch documentRegister;
 
     @Inject
     public DocumentListClient(CloseableHttpClient httpClient, AconexConfig config) {
@@ -41,18 +45,11 @@ public class DocumentListClient {
         this.config = config;
     }
 
-    @SneakyThrows
-    public List<Document> getDocuments(String projectId, int pageNumber) {
-        log.info("Getting documents {}:{}", projectId, pageNumber);
+    public List<Document> getDocuments(String projectId, int pageNumber) throws IOException {
+        log.debug("Getting documents {}:{}", projectId, pageNumber);
 
         List<Document> documents = new ArrayList<>();
-        int maxItems = config.properties().limit().maxItems();
         URI uri = RestApiUriBuilder.buildDocumentsUri(config.properties().api().host(), projectId, pageNumber, config.properties().limit().pageSize(), config.properties().project().documentReturnFields());
-
-        if (maxItems > 0 && maxItems <= 500) { // 500 is the max for a single Aconex request
-            uri = RestApiUriBuilder.buildLimitedDocumentsUri(config.properties().api().host(), projectId, maxItems, config.properties().project().documentReturnFields());
-        }
-
         HttpGet request = HttpClientHelper.createHttpRequest(uri, config);
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -63,13 +60,29 @@ public class DocumentListClient {
                     documents.forEach(d -> d.setUrl(config.properties().api().host(), projectId));
                 }
             } else {
-                log.warn("An error occurred while accessing project #{}. Aconex API response: {}", projectId, response.getStatusLine());
+                log.error("{} response. Error: {}", response.getStatusLine().getReasonPhrase(), EntityUtils.toString(response.getEntity()));
+                // throw new IOException(response.getStatusLine().getReasonPhrase());
             }
         }
 
-        log.info("{} documents processed", documents.size());
+        log.debug("{} documents processed", documents.size());
 
         return documents;
+    }
+
+    /**
+     * A wrapper method for {@link #getDocuments(String, int)}
+     *
+     * @param projectId Project ID
+     * @param pageNumber Page Number
+     * @return Map - String, Object: {@link RegisterSearch} | List of {@link Document}
+     */
+    public Map<String, Object> getDocumentRegister(String projectId, int pageNumber) throws IOException {
+        Map<String, Object> results = new HashMap<>();
+        results.put(DOCUMENTS, getDocuments(projectId, pageNumber));
+        results.put(REGISTER, getDocumentRegister());
+
+        return results;
     }
 
     /**
@@ -87,9 +100,9 @@ public class DocumentListClient {
         if (result == null || result.getDocuments() == null) {
             log.warn("Document search results empty for project.");
         } else {
-            log.info("{} documents found", result.getDocuments().size());
-            setTotalPages(registerSearch.getTotalPages());
-            result.getDocuments().forEach(Document::setDocument);
+            log.debug("{} documents found", result.getDocuments().size());
+
+            setDocumentRegister(registerSearch);
             documents = applyDocumentFilter(result.getDocuments());
         }
 
@@ -112,41 +125,35 @@ public class DocumentListClient {
 
         if (excludeEmptyDocument) {
             //SP-57: 1348828088672012186 1348828088682002271
-            log.info("Applying excluded empty file {} document filter", excludedFileExtensions);
+            log.debug("Applying excluded empty file {} document filter", excludedFileExtensions);
             documents.removeIf(doc -> doc.getFileType() == null || doc.getFileType().equals("") || doc.getFileSize() <= 0);
         }
 
         if (CollectionUtils.isNotEmpty(includedFileExtensions)) {
-            log.info("Applying included file type {} document filter", includedFileExtensions);
+            log.debug("Applying included file type {} document filter", includedFileExtensions);
             documents.removeIf(doc -> doc.getFileType() == null || !includedFileExtensions.contains(doc.getFileType().toLowerCase()));
         } else if (CollectionUtils.isNotEmpty(excludedFileExtensions)) {
-            log.info("Applying excluded file type {} document filter", excludedFileExtensions);
+            log.debug("Applying excluded file type {} document filter", excludedFileExtensions);
             documents.removeIf(doc -> doc.getFileType() == null || excludedFileExtensions.contains(doc.getFileType().toLowerCase()));
         }
 
         if (!includeNonDocMetadata) {
-            log.info("Applying excluded file type {} document filter", excludedFileExtensions);
-            documents.removeIf(doc -> !doc.isDocument());
+            log.debug("Applying excluded file type {} document filter", excludedFileExtensions);
+            documents.removeIf(doc -> !DEFAULT_DOC_FILE_TYPES.contains(doc.getFileType()));
         }
 
         if (maxFileSize > 0) {
-            log.info("Applying max file size {} document filter", maxFileSize);
+            log.debug("Applying max file size {} document filter", maxFileSize);
             documents.removeIf(doc -> doc.getFileSize() > maxFileSize);
         }
 
         if (minFileSize > 0) {
-            log.info("Applying min file size {} document filter", minFileSize);
+            log.debug("Applying min file size {} document filter", minFileSize);
             documents.removeIf(doc -> doc.getFileSize() < minFileSize);
         }
 
         return documents;
     }
 
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
-    }
 
-    public int getTotalPages() {
-        return totalPages;
-    }
 }
