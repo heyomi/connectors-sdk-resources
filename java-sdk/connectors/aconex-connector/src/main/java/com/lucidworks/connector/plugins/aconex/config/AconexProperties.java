@@ -40,8 +40,7 @@ public interface AconexProperties extends Model {
     @Property(
             title = "Limits",
             description = "Options for including or excluding documents.",
-            order = 5,
-            hints = { UIHints.ADVANCED }
+            order = 5
     )
     LimitProperties limit();
 
