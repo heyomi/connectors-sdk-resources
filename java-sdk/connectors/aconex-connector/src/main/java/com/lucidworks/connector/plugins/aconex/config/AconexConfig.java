@@ -6,8 +6,8 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
 import com.lucidworks.fusion.schema.SchemaAnnotations.RootSchema;
 
 @RootSchema(
-        title = "Aconex Connector",
-        description = "A simple Aconex connector",
+        title = "Aconex",
+        description = "Connector for Aconex",
         category = "Aconex"
 )
 public interface AconexConfig extends ConnectorConfig<AconexConfig.Properties> {

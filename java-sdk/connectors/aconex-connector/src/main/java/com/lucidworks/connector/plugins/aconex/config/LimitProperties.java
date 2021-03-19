@@ -7,6 +7,7 @@ import com.lucidworks.fusion.schema.SchemaAnnotations.BooleanSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.StringSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.NumberSchema;
 import com.lucidworks.fusion.schema.SchemaAnnotations.Property;
+import com.lucidworks.fusion.schema.UIHints;
 
 import java.util.Set;
 
@@ -51,7 +52,9 @@ public interface LimitProperties extends Model {
     @Property(
             title = "Document Character Limit",
             description = "To receive the full text of the document use -1",
-            order = 5)
+            order = 5,
+            hints = { UIHints.ADVANCED }
+    )
     @NumberSchema(defaultValue = -1, minimum = -1)
     int write();
 
@@ -65,7 +68,9 @@ public interface LimitProperties extends Model {
     @Property(
             title = "Exclude Empty Documents",
             description = "Prevents 'CANNOT_DOWNLOAD_EMPTY_DOCUMENT' error. Cannot download a registered document which does not have a backing file",
-            order = 6)
+            order = 6,
+            hints = { UIHints.ADVANCED }
+    )
     @BooleanSchema(defaultValue = true)
     boolean excludeEmptyDocuments();
 
